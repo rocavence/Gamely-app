@@ -7,10 +7,8 @@ let package = Package(
         .macOS(.v14)
     ],
     targets: [
-        .target(name: "CNotify", path: "Sources/CNotify"),
         .executableTarget(
             name: "Gamely",
-            dependencies: ["CNotify"],
             path: "Sources/Gamely"
         ),
     ],

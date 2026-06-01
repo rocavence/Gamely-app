@@ -18,7 +18,9 @@ macOS Game Mode 一啟動就自動關閉系統 Hot Corners，遊戲結束再自�
 ## 運作原理
 
 ### 偵測 Game Mode
-macOS 沒有公開的 Game Mode API，但系統的 `gamepolicyd` 會送出 `notify(3)` 通知。Gamely 訂閱 `com.apple.gamepolicy.game-mode-session`（及 `fullscreenStateChanged`、`GameExited`），每次觸發就用 `notify_get_state` 讀狀態——非零即代表 Game Mode 開啟。純 libnotify，不連任何私有 framework（`notify.h` 不在 Swift 的 Darwin module 裡，所以用一個 `CNotify` C shim 重新匯出）。
+macOS 沒有公開的 Game Mode API。唯一可靠的訊號是 **unified log**：`gamepolicyd` / `GamePolicyAgent` 在切換時會印出 `Game mode is on, with N user game processes` / `Game mode is off, …`。Gamely 起一個 `log stream` 子程序、用 predicate 過濾這些訊息來判斷開/關（啟動時另用 `log show` 讀最近一次轉換當作初始狀態，兼做崩潰復原）。
+
+> Game Mode 只對**全螢幕**且 `LSApplicationCategoryType` 結尾為 `.games` 的 app 啟用。透過轉譯層跑的 Windows 遊戲（部分 Steam 遊戲）通常不符合，系統就不會開 Game Mode，Gamely 也就不會動作——這是依設計「跟隨 macOS Game Mode」。原生、有正確分類的全螢幕遊戲（例如系統內建的 Chess.app）才會觸發。
 
 ### 關閉 / 還原 Hot Corners
 Hot Corners 存在 Dock 的偏好設定 `wvous-{tl,tr,bl,br}-corner`。Gamely：
@@ -59,7 +61,7 @@ open build/Gamely.app
 ## 技術棧
 
 - **Swift 6** / **AppKit**（純 system framework）
-- **libnotify (`notify(3)`)** 經 `CNotify` C shim 偵測 Game Mode
+- **`log stream`/`log show`** 監看 unified log 偵測 Game Mode
 - **`UserDefaults(suiteName: "com.apple.dock")`** 讀寫 Hot Corner 設定 + `killall Dock`
 - **`SMAppService`** 開機自啟
 - **Swift Package Manager** + shell script 打 `.app` bundle + ad-hoc codesign
@@ -71,11 +73,10 @@ open build/Gamely.app
 Gamely/
 ├── Package.swift
 ├── Sources/
-│   ├── CNotify/                # C shim 重新匯出 <notify.h>
 │   └── Gamely/
 │       ├── main.swift
 │       ├── AppDelegate.swift       # 選單列 + 串接
-│       ├── GameModeMonitor.swift   # notify(3) 偵測
+│       ├── GameModeMonitor.swift   # log-stream 偵測
 │       ├── HotCornerController.swift# 存/關/還原 Hot Corners
 │       ├── LoginItem.swift          # SMAppService 開機自啟
 │       └── Defaults.swift           # 偏好 + 存的原值
