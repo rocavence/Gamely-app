@@ -33,6 +33,7 @@ final class GameModeMonitor: @unchecked Sendable {
     }
 
     func start() {
+        Self.reapStrayStreams()   // clean up any `log stream` orphaned by a prior crash/kill
         startStream()
         // Seed the initial state in the background: `log show` over a wide window
         // can take several seconds and must not block app launch. Skip the result
@@ -44,6 +45,19 @@ final class GameModeMonitor: @unchecked Sendable {
                 self.update(initial)
             }
         }
+    }
+
+    /// Kill any `log stream` we left running before (e.g. after a crash or a
+    /// hard kill that skipped applicationWillTerminate), matched by our distinctive
+    /// predicate, so they don't pile up.
+    private static func reapStrayStreams() {
+        let task = Process()
+        task.executableURL = URL(fileURLWithPath: "/usr/bin/pkill")
+        task.arguments = ["-f", "log stream.*gamepolicyd.*GamePolicyAgent"]
+        task.standardOutput = Pipe()
+        task.standardError = Pipe()
+        try? task.run()
+        task.waitUntilExit()
     }
 
     func stop() {

@@ -44,6 +44,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     func applicationWillTerminate(_ notification: Notification) {
+        // Tear down the `log stream` child so it doesn't outlive us as an orphan.
+        monitor?.stop()
+        activeAppMonitor?.stop()
         // Never leave the user's Hot Corners paused after we go away.
         HotCornerController.restore()
     }
