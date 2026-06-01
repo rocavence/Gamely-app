@@ -1,0 +1,34 @@
+/* Gamely — English (en) localization */
+
+/* Version label in the menu, %@ is the version number */
+"Gamely %@" = "Gamely %@";
+
+/* Status line when Game Mode is not active */
+"Game Mode: Off" = "Game Mode: Off";
+
+/* Status line: Game Mode active */
+"Game Mode: On" = "Game Mode: On";
+
+/* Status line: Game Mode active and Hot Corners paused */
+"Game Mode: On — Hot Corners paused" = "Game Mode: On — Hot Corners paused";
+
+/* Toggle: pause Hot Corners while Game Mode is active */
+"Pause Hot Corners in Game Mode" = "Pause Hot Corners in Game Mode";
+
+/* Toggle: launch Gamely at login */
+"Launch at Login" = "Launch at Login";
+
+/* Submenu: apps that force Game Mode behavior */
+"Force Game Mode for Apps" = "Force Game Mode for Apps";
+
+/* Action: add the frontmost app to the whitelist */
+"Add Frontmost App" = "Add Frontmost App";
+
+/* Action: restore the user's Hot Corners immediately */
+"Restore Hot Corners Now" = "Restore Hot Corners Now";
+
+/* Debug-only action to simulate Game Mode */
+"Simulate Game Mode (debug)" = "Simulate Game Mode (debug)";
+
+/* Action: quit the app */
+"Quit Gamely" = "Quit Gamely";

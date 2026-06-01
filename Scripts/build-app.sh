@@ -21,6 +21,10 @@ cp "Resources/Info.plist" "${CONTENTS}/Info.plist"
 if [[ -f "Resources/AppIcon.icns" ]]; then
   cp "Resources/AppIcon.icns" "${RES_DIR}/AppIcon.icns"
 fi
+# Bundle every localization (.lproj) so NSLocalizedString can load it at runtime.
+for lproj in Resources/*.lproj; do
+  cp -R "$lproj" "${RES_DIR}/"
+done
 printf 'APPL????' > "${CONTENTS}/PkgInfo"
 
 echo "→ ad-hoc codesign"

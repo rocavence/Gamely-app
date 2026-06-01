@@ -106,26 +106,27 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         menu.delegate = self
 
         let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "?"
-        let versionItem = NSMenuItem(title: "Gamely \(version)", action: nil, keyEquivalent: "")
+        let versionTitle = String(format: NSLocalizedString("Gamely %@", comment: "Version label in the menu, %@ is the version number"), version)
+        let versionItem = NSMenuItem(title: versionTitle, action: nil, keyEquivalent: "")
         versionItem.isEnabled = false
         menu.addItem(versionItem)
         menu.addItem(.separator())
 
-        statusLine = NSMenuItem(title: "Game Mode: Off", action: nil, keyEquivalent: "")
+        statusLine = NSMenuItem(title: NSLocalizedString("Game Mode: Off", comment: "Status line when Game Mode is not active"), action: nil, keyEquivalent: "")
         statusLine.isEnabled = false
         menu.addItem(statusLine)
         menu.addItem(.separator())
 
-        enabledItem = NSMenuItem(title: "Pause Hot Corners in Game Mode",
+        enabledItem = NSMenuItem(title: NSLocalizedString("Pause Hot Corners in Game Mode", comment: "Toggle: pause Hot Corners while Game Mode is active"),
                                  action: #selector(toggleEnabled), keyEquivalent: "")
         enabledItem.target = self
         menu.addItem(enabledItem)
 
-        loginItem = NSMenuItem(title: "Launch at Login", action: #selector(toggleLogin), keyEquivalent: "")
+        loginItem = NSMenuItem(title: NSLocalizedString("Launch at Login", comment: "Toggle: launch Gamely at login"), action: #selector(toggleLogin), keyEquivalent: "")
         loginItem.target = self
         menu.addItem(loginItem)
 
-        whitelistItem = NSMenuItem(title: "Force Game Mode for Apps", action: nil, keyEquivalent: "")
+        whitelistItem = NSMenuItem(title: NSLocalizedString("Force Game Mode for Apps", comment: "Submenu: apps that force Game Mode behavior"), action: nil, keyEquivalent: "")
         let whitelistMenu = NSMenu()
         whitelistMenu.delegate = self
         // We manage enabled-state ourselves (target/action items + the "Add" guard).
@@ -135,18 +136,18 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
         menu.addItem(.separator())
 
-        restoreItem = NSMenuItem(title: "Restore Hot Corners Now",
+        restoreItem = NSMenuItem(title: NSLocalizedString("Restore Hot Corners Now", comment: "Action: restore the user's Hot Corners immediately"),
                                  action: #selector(restoreNow), keyEquivalent: "")
         restoreItem.target = self
         menu.addItem(restoreItem)
 
         if ProcessInfo.processInfo.environment["GAMELY_DEBUG"] != nil {
-            let sim = NSMenuItem(title: "Simulate Game Mode (debug)", action: #selector(toggleSimulate), keyEquivalent: "")
+            let sim = NSMenuItem(title: NSLocalizedString("Simulate Game Mode (debug)", comment: "Debug-only action to simulate Game Mode"), action: #selector(toggleSimulate), keyEquivalent: "")
             sim.target = self
             menu.addItem(sim)
         }
 
-        let quit = NSMenuItem(title: "Quit Gamely", action: #selector(quit), keyEquivalent: "q")
+        let quit = NSMenuItem(title: NSLocalizedString("Quit Gamely", comment: "Action: quit the app"), action: #selector(quit), keyEquivalent: "q")
         quit.target = self
         menu.addItem(quit)
 
@@ -161,8 +162,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         statusItem.button?.image = NSImage(systemSymbolName: symbol, accessibilityDescription: "Gamely")
 
         statusLine.title = active
-            ? (paused ? "Game Mode: On — Hot Corners paused" : "Game Mode: On")
-            : "Game Mode: Off"
+            ? (paused
+                ? NSLocalizedString("Game Mode: On — Hot Corners paused", comment: "Status line: Game Mode active and Hot Corners paused")
+                : NSLocalizedString("Game Mode: On", comment: "Status line: Game Mode active"))
+            : NSLocalizedString("Game Mode: Off", comment: "Status line when Game Mode is not active")
         enabledItem.state = Defaults.enabled ? .on : .off
         loginItem.state = LoginItem.isEnabled ? .on : .off
         restoreItem.isHidden = !paused
@@ -185,7 +188,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             menu.addItem(.separator())
         }
 
-        let add = NSMenuItem(title: "Add Frontmost App",
+        let add = NSMenuItem(title: NSLocalizedString("Add Frontmost App", comment: "Action: add the frontmost app to the whitelist"),
                              action: #selector(addFrontmostApp), keyEquivalent: "")
         add.target = self
         // Disable if there's nothing valid to add (no frontmost app, or it's us).
