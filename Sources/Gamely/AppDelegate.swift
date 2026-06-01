@@ -12,6 +12,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     /// Latest state from each source, fed into `updatePauseState()`.
     private var gameModeActive = false
     private var whitelistActive = false
+    /// Debounces the (Dock-restarting) apply so rapid flicker coalesces.
+    private var applyWork: DispatchWorkItem?
 
     /// Frontmost app captured when the menu opens — clicking the status item
     /// makes Gamely frontmost, so we can't read it lazily in the action.
@@ -51,7 +53,20 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     /// Single source of truth: pause Hot Corners while Gamely is enabled and any
     /// trigger is live (real Game Mode, a whitelisted app frontmost, or the debug
     /// simulation), otherwise restore them.
+    ///
+    /// The apply is debounced: entering a full-screen game makes Game Mode flicker
+    /// on/paused/on within a second, and each change restarts the Dock — doing that
+    /// repeatedly *during* the full-screen transition breaks it. Coalescing the
+    /// changes means the Dock is restarted once, after things settle.
     private func updatePauseState() {
+        updateUI()   // reflect intent in the menu immediately
+        applyWork?.cancel()
+        let work = DispatchWorkItem { [weak self] in self?.applyPauseState() }
+        applyWork = work
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5, execute: work)
+    }
+
+    private func applyPauseState() {
         let shouldPause = Defaults.enabled && (gameModeActive || whitelistActive || simulating)
         if shouldPause {
             HotCornerController.pause()
