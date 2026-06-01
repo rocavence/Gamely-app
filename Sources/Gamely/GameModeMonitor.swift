@@ -1,22 +1,30 @@
 import Foundation
 
-/// Detects macOS Game Mode by polling the unified log for gamepolicyd /
+/// Detects macOS Game Mode by watching the unified log for gamepolicyd /
 /// GamePolicyAgent's transition messages — the only reliable signal (there is
-/// no public API and the notify(3) state isn't populated). We poll `log show`
-/// on a short window rather than tailing `log stream`, because `log stream`
-/// block-buffers when its stdout is a pipe and small bursts never flush.
+/// no public API and the notify(3) state isn't populated).
+///
+/// We tail `log stream` event-driven rather than polling `log show`. `log`
+/// block-buffers when its stdout is a plain pipe, so small bursts never flush;
+/// but when stdout is a tty it line-buffers and delivers each line immediately.
+/// So we hand `log stream` the slave end of a pseudo-terminal (PTY) and read
+/// its master end via a dispatch source — near-zero idle CPU, no per-poll
+/// process spawn, and each transition lands the moment it's logged.
 ///
 /// Active when the log last said "Game mode status is now on" (or "enabled");
 /// inactive on "status is now paused/off" (or "disabled") — so tabbing out of
-/// the game (which pauses Game Mode) restores Hot Corners too.
+/// the game (which pauses Game Mode) restores Hot Corners too. A one-shot
+/// `log show --last 12h` seeds the initial state (and recovers after a crash).
 final class GameModeMonitor: @unchecked Sendable {
     private let onChange: (Bool) -> Void
-    private let queue = DispatchQueue(label: "com.gamely.monitor")
-    private var timer: DispatchSourceTimer?
+    private var process: Process?
+    private var masterFD: Int32 = -1
+    private var source: DispatchSourceRead?
+    private let ioQueue = DispatchQueue(label: "com.gamely.monitor")
+    private var buffer = Data()
+    private var seenLiveTransition = false
     private(set) var isActive = false
 
-    private static let pollInterval: TimeInterval = 3
-    private static let window = 10           // seconds of log to scan each poll
     private static let predicate =
         #"(process == "gamepolicyd" OR process == "GamePolicyAgent") AND eventMessage CONTAINS[c] "game mode""#
 
@@ -25,24 +33,80 @@ final class GameModeMonitor: @unchecked Sendable {
     }
 
     func start() {
-        isActive = Self.lastTransition(lastSeconds: 12 * 3600) ?? false   // initial + crash recovery
-        onChange(isActive)
-
-        let t = DispatchSource.makeTimerSource(queue: queue)
-        t.schedule(deadline: .now() + Self.pollInterval, repeating: Self.pollInterval)
-        t.setEventHandler { [weak self] in self?.poll() }
-        t.resume()
-        timer = t
+        startStream()
+        // Seed the initial state in the background: `log show` over a wide window
+        // can take several seconds and must not block app launch. Skip the result
+        // if the live stream has already reported a transition by then.
+        ioQueue.async { [weak self] in
+            let initial = Self.currentStateFromLog() ?? false
+            DispatchQueue.main.async {
+                guard let self, !self.seenLiveTransition else { return }
+                self.update(initial)
+            }
+        }
     }
 
     func stop() {
-        timer?.cancel()
-        timer = nil
+        source?.cancel()
+        source = nil
+        process?.terminate()
+        process = nil
+        if masterFD >= 0 { close(masterFD); masterFD = -1 }
     }
 
-    private func poll() {
-        guard let latest = Self.lastTransition(lastSeconds: Self.window) else { return }
-        DispatchQueue.main.async { [weak self] in self?.update(latest) }
+    /// Spawns `log stream` with stdout wired to a PTY so it line-buffers, and
+    /// reads the master end on `ioQueue` via a dispatch read source.
+    private func startStream() {
+        let master = posix_openpt(O_RDWR | O_NOCTTY)
+        guard master >= 0, grantpt(master) == 0, unlockpt(master) == 0,
+              let namePtr = ptsname(master) else {
+            if master >= 0 { close(master) }
+            return
+        }
+        let slavePath = String(cString: namePtr)
+        let slave = open(slavePath, O_RDWR | O_NOCTTY)
+        guard slave >= 0 else { close(master); return }
+        masterFD = master
+
+        let task = Process()
+        task.executableURL = URL(fileURLWithPath: "/usr/bin/log")
+        task.arguments = ["stream", "--style", "compact", "--predicate", Self.predicate]
+        task.standardOutput = FileHandle(fileDescriptor: slave, closeOnDealloc: false)
+        task.standardError = Pipe()
+
+        let src = DispatchSource.makeReadSource(fileDescriptor: master, queue: ioQueue)
+        src.setEventHandler { [weak self] in
+            guard let self else { return }
+            var buf = [UInt8](repeating: 0, count: 4096)
+            let n = read(self.masterFD, &buf, buf.count)
+            if n > 0 { self.handle(Data(buf[0..<n])) }
+        }
+        source = src
+
+        do {
+            try task.run()
+            process = task
+            close(slave)            // child holds its own dup; parent doesn't need it
+            src.resume()
+        } catch {
+            NSLog("Gamely: `log stream` failed to start: \(error)")
+            close(slave)
+        }
+    }
+
+    /// Accumulates stream bytes and applies any complete line's transition.
+    private func handle(_ data: Data) {
+        buffer.append(data)
+        while let nl = buffer.firstIndex(of: 0x0A) {
+            let lineData = buffer.subdata(in: buffer.startIndex..<nl)
+            buffer.removeSubrange(buffer.startIndex...nl)
+            guard let line = String(data: lineData, encoding: .utf8),
+                  let active = Self.transition(in: line) else { continue }
+            DispatchQueue.main.async { [weak self] in
+                self?.seenLiveTransition = true
+                self?.update(active)
+            }
+        }
     }
 
     private func update(_ active: Bool) {
@@ -51,12 +115,23 @@ final class GameModeMonitor: @unchecked Sendable {
         onChange(active)
     }
 
-    /// The most recent Game Mode on/off transition within the window, or nil if
-    /// the window contains no transition (state unchanged).
-    private static func lastTransition(lastSeconds: Int) -> Bool? {
+    /// Parses a single log line into an on/off transition, or nil if the line
+    /// carries no Game Mode state change.
+    private static func transition(in line: String) -> Bool? {
+        let l = line.lowercased()
+        guard l.contains("game mode") else { return nil }
+        if l.contains("status is now on") || l.contains("game mode enabled") { return true }
+        if l.contains("status is now paused") || l.contains("status is now off")
+            || l.contains("game mode disabled") { return false }
+        return nil
+    }
+
+    /// Seeds the initial state from the last 12h of log, or nil if no transition
+    /// is found (state unknown).
+    private static func currentStateFromLog() -> Bool? {
         let task = Process()
         task.executableURL = URL(fileURLWithPath: "/usr/bin/log")
-        task.arguments = ["show", "--last", "\(lastSeconds)s", "--style", "compact", "--predicate", predicate]
+        task.arguments = ["show", "--last", "1h", "--style", "compact", "--predicate", predicate]
         let pipe = Pipe()
         task.standardOutput = pipe
         task.standardError = Pipe()
@@ -67,14 +142,7 @@ final class GameModeMonitor: @unchecked Sendable {
 
         var state: Bool?
         for line in text.split(whereSeparator: \.isNewline) {
-            let l = line.lowercased()
-            guard l.contains("game mode") else { continue }
-            if l.contains("status is now on") || l.contains("game mode enabled") {
-                state = true
-            } else if l.contains("status is now paused") || l.contains("status is now off")
-                        || l.contains("game mode disabled") {
-                state = false
-            }
+            if let t = transition(in: String(line)) { state = t }
         }
         return state
     }

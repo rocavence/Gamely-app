@@ -4,21 +4,41 @@ import AppKit
 final class AppDelegate: NSObject, NSApplicationDelegate {
     private var statusItem: NSStatusItem!
     private var monitor: GameModeMonitor!
+    private var activeAppMonitor: ActiveAppMonitor!
     /// Debug-only manual override (GAMELY_DEBUG) to exercise the pause/restore
     /// path without launching a real game.
     private var simulating = false
 
+    /// Latest state from each source, fed into `updatePauseState()`.
+    private var gameModeActive = false
+    private var whitelistActive = false
+
+    /// Frontmost app captured when the menu opens — clicking the status item
+    /// makes Gamely frontmost, so we can't read it lazily in the action.
+    private var capturedFrontmostApp: NSRunningApplication?
+
     private var statusLine: NSMenuItem!
     private var enabledItem: NSMenuItem!
     private var loginItem: NSMenuItem!
+    private var whitelistItem: NSMenuItem!
     private var restoreItem: NSMenuItem!
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         setupStatusBar()
         monitor = GameModeMonitor { [weak self] active in
-            MainActor.assumeIsolated { self?.gameModeChanged(active) }
+            MainActor.assumeIsolated {
+                self?.gameModeActive = active
+                self?.updatePauseState()
+            }
         }
         monitor.start()
+        activeAppMonitor = ActiveAppMonitor { [weak self] active in
+            MainActor.assumeIsolated {
+                self?.whitelistActive = active
+                self?.updatePauseState()
+            }
+        }
+        activeAppMonitor.start()
     }
 
     func applicationWillTerminate(_ notification: Notification) {
@@ -26,11 +46,15 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         HotCornerController.restore()
     }
 
-    // MARK: - Game Mode → Hot Corners
+    // MARK: - Pause state
 
-    private func gameModeChanged(_ active: Bool) {
-        if active {
-            if Defaults.enabled { HotCornerController.pause() }
+    /// Single source of truth: pause Hot Corners while Gamely is enabled and any
+    /// trigger is live (real Game Mode, a whitelisted app frontmost, or the debug
+    /// simulation), otherwise restore them.
+    private func updatePauseState() {
+        let shouldPause = Defaults.enabled && (gameModeActive || whitelistActive || simulating)
+        if shouldPause {
+            HotCornerController.pause()
         } else {
             HotCornerController.restore()
         }
@@ -59,6 +83,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         loginItem.target = self
         menu.addItem(loginItem)
 
+        whitelistItem = NSMenuItem(title: "Force Game Mode for Apps", action: nil, keyEquivalent: "")
+        let whitelistMenu = NSMenu()
+        whitelistMenu.delegate = self
+        // We manage enabled-state ourselves (target/action items + the "Add" guard).
+        whitelistMenu.autoenablesItems = false
+        whitelistItem.submenu = whitelistMenu
+        menu.addItem(whitelistItem)
+
         menu.addItem(.separator())
 
         restoreItem = NSMenuItem(title: "Restore Hot Corners Now",
@@ -81,7 +113,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     private func updateUI() {
-        let active = (monitor?.isActive ?? false) || simulating
+        let active = gameModeActive || whitelistActive || simulating
         let paused = HotCornerController.isPaused
         let symbol = paused ? "gamecontroller.fill" : "gamecontroller"
         statusItem.button?.image = NSImage(systemSymbolName: symbol, accessibilityDescription: "Gamely")
@@ -94,17 +126,52 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         restoreItem.isHidden = !paused
     }
 
+    /// (Re)build the "Force Game Mode for Apps" submenu from the current whitelist.
+    private func rebuildWhitelistMenu(_ menu: NSMenu) {
+        menu.removeAllItems()
+
+        for bundleID in Defaults.whitelist {
+            let item = NSMenuItem(title: friendlyName(for: bundleID),
+                                  action: #selector(removeWhitelistApp(_:)), keyEquivalent: "")
+            item.target = self
+            item.representedObject = bundleID
+            item.state = .on
+            menu.addItem(item)
+        }
+
+        if !Defaults.whitelist.isEmpty {
+            menu.addItem(.separator())
+        }
+
+        let add = NSMenuItem(title: "Add Frontmost App",
+                             action: #selector(addFrontmostApp), keyEquivalent: "")
+        add.target = self
+        // Disable if there's nothing valid to add (no frontmost app, or it's us).
+        let candidate = capturedFrontmostApp?.bundleIdentifier
+        add.isEnabled = candidate != nil
+            && candidate != Bundle.main.bundleIdentifier
+            && !Defaults.whitelist.contains(candidate!)
+        menu.addItem(add)
+    }
+
+    /// A human-friendly name for a bundle ID: the app's localized name if we can
+    /// find it (running or installed), otherwise the raw bundle ID.
+    private func friendlyName(for bundleID: String) -> String {
+        if let running = NSRunningApplication.runningApplications(withBundleIdentifier: bundleID).first,
+           let name = running.localizedName {
+            return name
+        }
+        if let url = NSWorkspace.shared.urlForApplication(withBundleIdentifier: bundleID) {
+            return url.deletingPathExtension().lastPathComponent
+        }
+        return bundleID
+    }
+
     // MARK: - Actions
 
     @objc private func toggleEnabled() {
         Defaults.enabled.toggle()
-        // If the user turns Gamely off mid-game, give their corners back now.
-        if !Defaults.enabled {
-            HotCornerController.restore()
-        } else if monitor.isActive {
-            HotCornerController.pause()
-        }
-        updateUI()
+        updatePauseState()
     }
 
     @objc private func toggleLogin() {
@@ -119,12 +186,41 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     @objc private func toggleSimulate() {
         simulating.toggle()
-        gameModeChanged(simulating)
+        updatePauseState()
+    }
+
+    @objc private func removeWhitelistApp(_ sender: NSMenuItem) {
+        guard let bundleID = sender.representedObject as? String else { return }
+        Defaults.whitelist.removeAll { $0 == bundleID }
+        activeAppMonitor.recheck()
+        updatePauseState()
+    }
+
+    @objc private func addFrontmostApp() {
+        guard let bundleID = capturedFrontmostApp?.bundleIdentifier,
+              bundleID != Bundle.main.bundleIdentifier,
+              !Defaults.whitelist.contains(bundleID) else { return }
+        Defaults.whitelist.append(bundleID)
+        activeAppMonitor.recheck()
+        updatePauseState()
     }
 
     @objc private func quit() { NSApp.terminate(nil) }
 }
 
 extension AppDelegate: NSMenuDelegate {
-    func menuNeedsUpdate(_ menu: NSMenu) { updateUI() }
+    func menuWillOpen(_ menu: NSMenu) {
+        // Capture the real frontmost app before clicking the status item steals focus.
+        if menu == statusItem.menu {
+            capturedFrontmostApp = NSWorkspace.shared.frontmostApplication
+        }
+    }
+
+    func menuNeedsUpdate(_ menu: NSMenu) {
+        if menu == whitelistItem.submenu {
+            rebuildWhitelistMenu(menu)
+        } else {
+            updateUI()
+        }
+    }
 }
