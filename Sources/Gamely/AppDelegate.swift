@@ -14,6 +14,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private var whitelistActive = false
     /// Debounces the (Dock-restarting) apply so rapid flicker coalesces.
     private var applyWork: DispatchWorkItem?
+    /// When the apply last ran, to hard-cap `killall Dock` to ≤1 per 2s even if
+    /// transitions arrive spaced just under the debounce window apart.
+    private var lastApplyAt: Date?
 
     /// Frontmost app captured when the menu opens — clicking the status item
     /// makes Gamely frontmost, so we can't read it lazily in the action.
@@ -70,6 +73,21 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     private func applyPauseState() {
+        // Hard floor: never restart the Dock more than once per 2s. If the last
+        // apply was too recent, defer this one to just past the floor (replacing
+        // any pending work) instead of running it now.
+        if let last = lastApplyAt {
+            let elapsed = Date().timeIntervalSince(last)
+            if elapsed < 2 {
+                applyWork?.cancel()
+                let work = DispatchWorkItem { [weak self] in self?.applyPauseState() }
+                applyWork = work
+                DispatchQueue.main.asyncAfter(deadline: .now() + (2 - elapsed), execute: work)
+                return
+            }
+        }
+        lastApplyAt = Date()
+
         let shouldPause = Defaults.enabled && (gameModeActive || whitelistActive || simulating)
         if shouldPause {
             HotCornerController.pause()

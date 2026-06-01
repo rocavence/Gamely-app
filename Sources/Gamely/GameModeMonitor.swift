@@ -20,7 +20,9 @@ final class GameModeMonitor: @unchecked Sendable {
     private var process: Process?
     private var masterFD: Int32 = -1
     private var source: DispatchSourceRead?
-    private let ioQueue = DispatchQueue(label: "com.gamely.monitor")
+    // .utility QoS so this persistent log tail is scheduled on efficiency cores,
+    // keeping its idle energy impact low.
+    private let ioQueue = DispatchQueue(label: "com.gamely.monitor", qos: .utility)
     private var buffer = Data()
     private var seenLiveTransition = false
     private(set) var isActive = false
@@ -108,18 +110,47 @@ final class GameModeMonitor: @unchecked Sendable {
         }
     }
 
+    /// "game mode", lowercased ASCII — the substring every transition line
+    /// carries. Used to gate String transcoding (see `handle`).
+    private static let gameModeBytes: [UInt8] = Array("game mode".utf8)
+
     /// Accumulates stream bytes and applies any complete line's transition.
     private func handle(_ data: Data) {
         buffer.append(data)
         while let nl = buffer.firstIndex(of: 0x0A) {
             let lineData = buffer.subdata(in: buffer.startIndex..<nl)
             buffer.removeSubrange(buffer.startIndex...nl)
-            guard let line = String(data: lineData, encoding: .utf8),
+            // Cheap byte-level gate: only the rare line mentioning "game mode" can
+            // be a transition, so skip String transcoding for everything else.
+            guard Self.containsASCIICaseless(lineData, Self.gameModeBytes),
+                  let line = String(data: lineData, encoding: .utf8),
                   let active = Self.transition(in: line) else { continue }
             DispatchQueue.main.async { [weak self] in
                 self?.seenLiveTransition = true
                 self?.update(active)
             }
+        }
+    }
+
+    /// Case-insensitive (ASCII) search for `needle`'s bytes in `haystack`.
+    /// `needle` must already be lowercase ASCII. Matches the case-folding that
+    /// `transition(in:)` does via `lowercased()`, so it never rejects a line the
+    /// String path would accept.
+    private static func containsASCIICaseless(_ haystack: Data, _ needle: [UInt8]) -> Bool {
+        guard !needle.isEmpty, haystack.count >= needle.count else { return false }
+        let last = haystack.count - needle.count
+        return haystack.withUnsafeBytes { (raw: UnsafeRawBufferPointer) -> Bool in
+            let bytes = raw.bindMemory(to: UInt8.self)
+            for start in 0...last {
+                var matched = true
+                for i in 0..<needle.count {
+                    var c = bytes[start + i]
+                    if c >= 65 && c <= 90 { c += 32 }   // ASCII upper -> lower
+                    if c != needle[i] { matched = false; break }
+                }
+                if matched { return true }
+            }
+            return false
         }
     }
 
