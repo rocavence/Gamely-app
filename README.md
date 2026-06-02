@@ -1,81 +1,81 @@
 # Gamely
 
-**English** · [繁體中文](README.zh-Hant.md)
+**繁體中文** · [English](README.en.md)
 
-The moment macOS Game Mode turns on, it automatically disables the system Hot Corners, and restores them when the game ends. Lives in the menu bar.
+macOS Game Mode 一啟動就自動關閉系統 Hot Corners，遊戲結束再自動還原。常駐選單列。
 
 <p align="center">
   <img src="Resources/icon-1024.png" width="160" alt="Gamely icon">
 </p>
 
-## What it does
+## 它在做什麼
 
-When you're playing a fullscreen game, accidentally sliding the mouse into a screen corner triggers Mission Control / Desktop / Screen Saver—a real buzzkill. Gamely is a small menu-bar utility:
+玩全螢幕遊戲時，滑鼠不小心滑到螢幕角落就觸發 Mission Control / 桌面 / 螢幕保護程式——很掃興。Gamely 是一個常駐選單列的小工具：
 
-- Detects macOS **Game Mode turning on** → temporarily sets all four **Hot Corners** to "no action"
-- Game Mode **turns off** → **restores your original Hot Corner settings exactly as they were**
-- Supports **launch at login**
-- Runs entirely in the background, with just a single 🎮 icon in the menu bar
+- 偵測到 macOS **Game Mode 啟動** → 暫時把四個 **Hot Corners** 設為「無動作」
+- Game Mode **結束** → 把你原本的 Hot Corner 設定**原封不動還原**
+- 支援**開機自動啟動**
+- 全程在背景，只有選單列一個 🎮 圖示
 
-## How it works
+## 運作原理
 
-### Detecting Game Mode
-macOS has no public Game Mode API. The only reliable signal is the **unified log**: `gamepolicyd` / `GamePolicyAgent` prints `Game mode is on, with N user game processes` / `Game mode is off, …` on each transition. Gamely spawns a `log stream` subprocess and filters these messages with a predicate to tell on/off (at startup it also uses `log show` to read the most recent transition as the initial state, which doubles as crash recovery).
+### 偵測 Game Mode
+macOS 沒有公開的 Game Mode API。唯一可靠的訊號是 **unified log**：`gamepolicyd` / `GamePolicyAgent` 在切換時會印出 `Game mode is on, with N user game processes` / `Game mode is off, …`。Gamely 起一個 `log stream` 子程序、用 predicate 過濾這些訊息來判斷開/關（啟動時另用 `log show` 讀最近一次轉換當作初始狀態，兼做崩潰復原）。
 
-> Game Mode only activates for apps that are **fullscreen** and whose `LSApplicationCategoryType` ends in `.games`. Windows games running through a translation layer (some Steam games) usually don't qualify, so the system won't turn on Game Mode and Gamely won't act either—this is by design, "following macOS Game Mode." Only native, correctly-categorized fullscreen games (e.g. the built-in Chess.app) will trigger it.
+> Game Mode 只對**全螢幕**且 `LSApplicationCategoryType` 結尾為 `.games` 的 app 啟用。透過轉譯層跑的 Windows 遊戲（部分 Steam 遊戲）通常不符合，系統就不會開 Game Mode，Gamely 也就不會動作——這是依設計「跟隨 macOS Game Mode」。原生、有正確分類的全螢幕遊戲（例如系統內建的 Chess.app）才會觸發。
 
-### Disabling / restoring Hot Corners
-Hot Corners live in the Dock preferences as `wvous-{tl,tr,bl,br}-corner`. Gamely:
+### 關閉 / 還原 Hot Corners
+Hot Corners 存在 Dock 的偏好設定 `wvous-{tl,tr,bl,br}-corner`。Gamely：
 
-1. First saves your current four-corner settings (including modifier keys) into **Gamely's own defaults**
-2. Sets all four corners to `0` (no action) and applies it with `killall Dock`—the game is fullscreen, so you don't see the Dock restart
-3. When the game ends, writes the original values back and runs `killall Dock` again
+1. 先把你目前的四角設定（含修飾鍵）存到 **Gamely 自己的 defaults**
+2. 把四角都設成 `0`（無動作），`killall Dock` 套用——遊戲是全螢幕，Dock 重啟看不見
+3. 遊戲結束時寫回原值再 `killall Dock`
 
-The original values are stored in Gamely's own defaults, so **even if Gamely crashes mid-game**, the next launch will detect that Game Mode has already ended and restore automatically; quitting the app also restores them.
+原值存在自己的 defaults，所以**就算 Gamely 中途崩潰**，下次啟動偵測到 Game Mode 已結束就會自動還原；結束 app 也會還原。
 
-### Launch at login
-Registers a login item with `SMAppService.mainApp` (macOS 13+).
+### 開機自動啟動
+用 `SMAppService.mainApp`（macOS 13+）註冊登入項目。
 
-## Install
+## 安裝
 
-Download the latest `Gamely-x.y.z.zip` from [Releases](https://github.com/rocavence/Gamely-app/releases/latest), unzip it, and drag **Gamely.app** into `/Applications`. Requires macOS 14+ (Game Mode, since Sonoma).
+從 [Releases](https://github.com/rocavence/Gamely-app/releases/latest) 下載最新的 `Gamely-x.y.z.zip`,解壓後把 **Gamely.app** 拖進「應用程式」。需要 macOS 14+(Game Mode 自 Sonoma 起)。
 
-Gamely is self-signed (not notarized by Apple), so the first launch may be blocked. Allow it with either **Right-click → Open**, then **Open** in the dialog; or Terminal: `xattr -dr com.apple.quarantine /Applications/Gamely.app`, then open it.
+Gamely 是自簽 app(未經 Apple 公證),第一次打開可能被擋。用 **右鍵 → 打開**,在對話框再按一次「打開」;或終端機執行 `xattr -dr com.apple.quarantine /Applications/Gamely.app`,再打開。
 
-<details><summary>Build from source</summary>
+<details><summary>從原始碼自行 build</summary>
 
 ```bash
 git clone https://github.com/rocavence/Gamely-app.git
 cd Gamely-app
-./Scripts/make-icon.sh     # generate the app icon (optional)
+./Scripts/make-icon.sh     # 產生 app icon（選用）
 ./Scripts/build-app.sh
 open build/Gamely.app
 ```
-Requires Xcode Command Line Tools.
+只需要 Xcode Command Line Tools。
 </details>
 
-## Usage
+## 使用
 
-The 🎮 icon in the menu bar:
+選單列 🎮 圖示：
 
-| Item | Description |
+| 項目 | 說明 |
 |---|---|
-| Game Mode: … | Current state (Off / On — Hot Corners paused) |
-| Pause Hot Corners in Game Mode | Master switch; turn it off and Gamely won't act |
-| Launch at Login | Launch automatically at startup |
-| Restore Hot Corners Now | Manual restore (a safety net, shown only while paused) |
-| Quit Gamely | Quit (restores Hot Corners first) |
+| Game Mode: … | 目前狀態（Off / On — Hot Corners paused） |
+| Pause Hot Corners in Game Mode | 總開關；關掉 Gamely 就不動作 |
+| Launch at Login | 開機自動啟動 |
+| Restore Hot Corners Now | 手動還原（保險用，僅在暫停中顯示） |
+| Quit Gamely | 結束（會先還原 Hot Corners） |
 
-## Tech stack
+## 技術棧
 
-- **Swift 6** / **AppKit** (pure system frameworks)
-- **`log stream`/`log show`** to watch the unified log and detect Game Mode
-- **`UserDefaults(suiteName: "com.apple.dock")`** to read/write Hot Corner settings + `killall Dock`
-- **`SMAppService`** for launch at login
-- **Swift Package Manager** + a shell script to assemble the `.app` bundle and sign with a stable self-signed identity (when present)
-- **`CGContext` + SF Symbol + `iconutil`** to generate the icon programmatically
+- **Swift 6** / **AppKit**（純 system framework）
+- **`log stream`/`log show`** 監看 unified log 偵測 Game Mode
+- **`UserDefaults(suiteName: "com.apple.dock")`** 讀寫 Hot Corner 設定 + `killall Dock`
+- **`SMAppService`** 開機自啟
+- **Swift Package Manager** + shell script 打 `.app` bundle，有 stable self-signed identity 時用它簽章
+- **`CGContext` + SF Symbol + `iconutil`** 程式化生成 icon
 
-## Project structure
+## 專案結構
 
 ```
 Gamely/
@@ -83,26 +83,26 @@ Gamely/
 ├── Sources/
 │   └── Gamely/
 │       ├── main.swift
-│       ├── AppDelegate.swift       # menu bar + wiring
-│       ├── GameModeMonitor.swift   # log-stream detection
-│       ├── HotCornerController.swift# save/disable/restore Hot Corners
-│       ├── LoginItem.swift          # SMAppService launch at login
-│       └── Defaults.swift           # preferences + saved originals
+│       ├── AppDelegate.swift       # 選單列 + 串接
+│       ├── GameModeMonitor.swift   # log-stream 偵測
+│       ├── HotCornerController.swift# 存/關/還原 Hot Corners
+│       ├── LoginItem.swift          # SMAppService 開機自啟
+│       └── Defaults.swift           # 偏好 + 存的原值
 ├── Resources/                  # Info.plist / AppIcon.icns / icon-1024.png
 └── Scripts/                    # build-app.sh / make-icon.{sh,swift}
 ```
 
 ## Debug
 
-`GAMELY_DEBUG=1` adds a "Simulate Game Mode" item to the menu, so you can test the disable/restore flow without actually launching a game.
+`GAMELY_DEBUG=1` 會在選單加一個「Simulate Game Mode」項目，不用真的開遊戲就能測試關閉/還原流程。
 
-## Known limitations
+## 已知限制
 
-- macOS 14+; primarily tested on macOS 26 (Tahoe)
-- `killall Dock` makes the Dock flicker during restore (invisible during gameplay since it's fullscreen)
-- Game Mode detection relies on the system's `notify` names; if a future macOS version renames them, this needs to be updated to match
-- The self-signed build is not Apple-notarized; downloaded copies are Gatekeeper-blocked until the quarantine attribute is cleared (see Install). Distributing widely still needs Developer ID + notarization.
+- macOS 14+；主力測試 macOS 26（Tahoe）
+- `killall Dock` 在還原時 Dock 會閃一下（遊戲中因全螢幕看不見）
+- Game Mode 偵測倚賴系統的 `notify` 名稱，未來 macOS 版本若改名需跟著更新
+- 自簽 build 未經 Apple 公證；下載的副本在清除 quarantine 屬性前會被 Gatekeeper 擋下（見安裝）。要廣泛發佈給別人仍需 Developer ID + notarization
 
-## License
+## 授權
 
 MIT
