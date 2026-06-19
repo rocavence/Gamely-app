@@ -21,8 +21,14 @@
 /* Submenu: apps that force Game Mode behavior */
 "Force Game Mode for Apps" = "為應用程式強制啟用遊戲模式";
 
-/* Action: add the frontmost app to the whitelist */
-"Add Frontmost App" = "加入最前景的應用程式";
+/* Submenu: pick a running app to add to the whitelist */
+"Add App" = "加入應用程式";
+
+/* Placeholder when there are no running apps to add */
+"No apps to add" = "沒有可加入的應用程式";
+
+/* Action: pause the user's Hot Corners immediately */
+"Pause Hot Corners Now" = "立即暫停熱角";
 
 /* Action: restore the user's Hot Corners immediately */
 "Restore Hot Corners Now" = "立即還原熱角";

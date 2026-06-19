@@ -21,8 +21,14 @@
 /* Submenu: apps that force Game Mode behavior */
 "Force Game Mode for Apps" = "Force Game Mode for Apps";
 
-/* Action: add the frontmost app to the whitelist */
-"Add Frontmost App" = "Add Frontmost App";
+/* Submenu: pick a running app to add to the whitelist */
+"Add App" = "Add App";
+
+/* Placeholder when there are no running apps to add */
+"No apps to add" = "No apps to add";
+
+/* Action: pause the user's Hot Corners immediately */
+"Pause Hot Corners Now" = "Pause Hot Corners Now";
 
 /* Action: restore the user's Hot Corners immediately */
 "Restore Hot Corners Now" = "Restore Hot Corners Now";
