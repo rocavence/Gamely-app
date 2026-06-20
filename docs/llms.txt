@@ -1,0 +1,38 @@
+# Gamely
+
+> Gamely is a free, open-source macOS menu bar utility. The moment macOS Game Mode turns on, it automatically disables all four Hot Corners so a stray mouse can't trigger Mission Control, Desktop, or the Screen Saver during a fullscreen game — then restores your exact original settings when the game ends.
+
+- Platform: macOS 14 (Sonoma) or later
+- Price: Free, open source (MIT license)
+- Author: rocavence (https://github.com/rocavence)
+- Download: https://github.com/rocavence/Gamely-app/releases/latest
+- Source code: https://github.com/rocavence/Gamely-app
+- Website: https://gamely.rocavence.com
+
+## What it does
+
+When you play a fullscreen game, sliding the mouse into a screen corner can trigger Mission Control / Desktop / Quick Note / Screen Saver — a real buzzkill. Gamely fixes exactly that:
+
+- Detects macOS Game Mode turning on → temporarily sets all four Hot Corners (wvous-{tl,tr,bl,br}-corner) to "no action".
+- Game Mode turns off → restores your original Hot Corner settings exactly, including modifier keys.
+- Runs entirely in the background as a single menu bar icon. No Dock icon, no window, no notifications.
+- Supports launch at login.
+
+## How it works
+
+- Game Mode detection: macOS has no public Game Mode API. Gamely reads the system unified log via `log stream`; the `gamepolicyd` / `GamePolicyAgent` process prints "Game mode is on, with N user game processes" / "Game mode is off" on each transition. At startup it also uses `log show` to read the most recent transition as the initial state (which doubles as crash recovery).
+- Hot Corners: stored in Dock preferences. Gamely saves your current four-corner settings into its own defaults, sets all four to 0 (no action), and applies with `killall Dock` (invisible because the game is fullscreen). When the game ends it writes the originals back.
+- Crash-safe: originals live in Gamely's own preferences, so even if it crashes mid-game, the next launch detects Game Mode has ended and restores automatically. Quitting the app also restores first.
+- Launch at login: registered via `SMAppService.mainApp` (macOS 13+).
+
+## Notes and limitations
+
+- Game Mode only activates for fullscreen apps whose LSApplicationCategoryType ends in `.games`. Windows games via translation layers (some Steam titles) usually don't qualify, so the system won't enable Game Mode and Gamely won't act — by design, "following macOS Game Mode". Native, correctly-categorized fullscreen games (e.g. the built-in Chess.app) trigger it.
+- Gamely is self-signed (not Apple-notarized). On first launch, open via right-click → Open, or run `xattr -dr com.apple.quarantine /Applications/Gamely.app`.
+- Tech stack: Swift 6, AppKit, unified log, UserDefaults(suiteName: "com.apple.dock"), SMAppService.
+
+## Links
+
+- Download (latest release): https://github.com/rocavence/Gamely-app/releases/latest
+- Source code & docs: https://github.com/rocavence/Gamely-app
+- License: MIT

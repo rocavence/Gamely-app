@@ -3,12 +3,95 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Gamely — 遊戲時自動關閉 macOS Hot Corners</title>
-<meta name="description" content="Gamely 是一個常駐選單列的 macOS 小工具：Game Mode 一啟動就自動關閉 Hot Corners，遊戲結束再原封不動還原。">
+<title>Gamely — macOS 遊戲時自動關閉 Hot Corners 的選單列小工具</title>
+<meta name="description" content="Gamely 是一個免費開源的 macOS 選單列小工具：偵測到 Game Mode 啟動就自動關閉四個 Hot Corners（熱點角落），避免遊戲中滑鼠誤觸 Mission Control；遊戲結束再原封不動還原。支援 macOS 14+、開機自動啟動。">
+<meta name="keywords" content="Gamely, macOS, Hot Corners, 熱點角落, Game Mode, 遊戲模式, Mission Control, 選單列工具, menu bar app, 關閉熱點, disable hot corners while gaming, macOS gaming utility">
+<meta name="author" content="rocavence">
+<meta name="robots" content="index, follow, max-image-preview:large">
+<link rel="canonical" href="https://gamely.rocavence.com/">
+<link rel="alternate" hreflang="zh-Hant" href="https://gamely.rocavence.com/">
+<link rel="alternate" hreflang="en" href="https://gamely.rocavence.com/">
+<link rel="alternate" hreflang="x-default" href="https://gamely.rocavence.com/">
 <link rel="icon" type="image/png" href="icon.png">
-<meta property="og:title" content="Gamely">
-<meta property="og:description" content="macOS Game Mode 一啟動就自動關閉 Hot Corners，遊戲結束再自動還原。">
-<meta property="og:image" content="icon.png">
+<link rel="apple-touch-icon" href="icon.png">
+<!-- Open Graph -->
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Gamely">
+<meta property="og:url" content="https://gamely.rocavence.com/">
+<meta property="og:title" content="Gamely — 遊戲時自動關閉 macOS Hot Corners">
+<meta property="og:description" content="macOS Game Mode 一啟動，Gamely 就自動關閉四個 Hot Corners；遊戲結束再原封不動還原。免費、開源、常駐選單列。">
+<meta property="og:image" content="https://gamely.rocavence.com/icon.png">
+<meta property="og:image:width" content="1024">
+<meta property="og:image:height" content="1024">
+<meta property="og:locale" content="zh_TW">
+<meta property="og:locale:alternate" content="en_US">
+<!-- Twitter -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Gamely — 遊戲時自動關閉 macOS Hot Corners">
+<meta name="twitter:description" content="macOS Game Mode 一啟動就自動關閉 Hot Corners，遊戲結束再自動還原。免費開源的選單列小工具。">
+<meta name="twitter:image" content="https://gamely.rocavence.com/icon.png">
+<!-- Structured data: SoftwareApplication -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "Gamely",
+  "applicationCategory": "UtilitiesApplication",
+  "applicationSubCategory": "Menu Bar Utility",
+  "operatingSystem": "macOS 14.0 or later",
+  "softwareVersion": "0.1.8",
+  "description": "Gamely is a free, open-source macOS menu bar utility. When macOS Game Mode turns on, it automatically disables all four Hot Corners so a stray mouse can't trigger Mission Control during fullscreen games, and restores your exact original settings when the game ends.",
+  "url": "https://gamely.rocavence.com/",
+  "downloadUrl": "https://github.com/rocavence/Gamely-app/releases/latest",
+  "softwareHelp": "https://github.com/rocavence/Gamely-app",
+  "license": "https://opensource.org/licenses/MIT",
+  "isAccessibleForFree": true,
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+  "author": { "@type": "Person", "name": "rocavence", "url": "https://github.com/rocavence" },
+  "featureList": [
+    "Follows the official macOS Game Mode signal (no guessing or process scanning)",
+    "Disables all four Hot Corners during fullscreen games",
+    "Restores the exact original Hot Corner settings, including modifier keys",
+    "Crash-safe: restores on next launch if quit unexpectedly",
+    "Launch at login via SMAppService",
+    "Lives quietly in the menu bar with a single icon"
+  ]
+}
+</script>
+<!-- Structured data: FAQ -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "What does Gamely do?",
+      "acceptedAnswer": { "@type": "Answer", "text": "Gamely is a macOS menu bar utility that automatically disables your four Hot Corners the moment macOS Game Mode turns on, so a stray mouse can't trigger Mission Control, Desktop, or the Screen Saver during a fullscreen game. When the game ends, it restores your original Hot Corner settings exactly as they were." }
+    },
+    {
+      "@type": "Question",
+      "name": "How does Gamely detect Game Mode?",
+      "acceptedAnswer": { "@type": "Answer", "text": "macOS has no public Game Mode API, so Gamely reads the system unified log. When gamepolicyd prints 'Game mode is on', Gamely knows a qualifying fullscreen game has started and pauses the Hot Corners; when it prints 'Game mode is off', Gamely restores them." }
+    },
+    {
+      "@type": "Question",
+      "name": "Does Gamely cost anything?",
+      "acceptedAnswer": { "@type": "Answer", "text": "No. Gamely is completely free and open source under the MIT license. The source code is on GitHub at github.com/rocavence/Gamely-app." }
+    },
+    {
+      "@type": "Question",
+      "name": "Which macOS versions are supported?",
+      "acceptedAnswer": { "@type": "Answer", "text": "macOS 14 (Sonoma) or later, because Game Mode was introduced in Sonoma. The app is self-signed and not notarized, so on first launch open it via right-click → Open, or clear quarantine with 'xattr -dr com.apple.quarantine /Applications/Gamely.app'." }
+    },
+    {
+      "@type": "Question",
+      "name": "What happens if Gamely crashes during a game?",
+      "acceptedAnswer": { "@type": "Answer", "text": "Your original Hot Corner values are stored in Gamely's own preferences, so even if it crashes mid-game, the next launch detects that Game Mode has ended and restores them automatically. Quitting the app also restores them first." }
+    }
+  ]
+}
+</script>
 <style>
   :root{
     --violet:#7c5cff;
