@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gamely — 遊戲時自動關閉 macOS Hot Corners</title>
+<meta name="description" content="Gamely 是一個常駐選單列的 macOS 小工具：Game Mode 一啟動就自動關閉 Hot Corners，遊戲結束再原封不動還原。">
+<link rel="icon" type="image/png" href="icon.png">
+<meta property="og:title" content="Gamely">
+<meta property="og:description" content="macOS Game Mode 一啟動就自動關閉 Hot Corners，遊戲結束再自動還原。">
+<meta property="og:image" content="icon.png">
+<style>
+  :root{
+    --violet:#7c5cff;
+    --violet-2:#5e34d9;
+    --ink:#161320;
+    --muted:#6b6577;
+    --line:#ece9f4;
+    --bg:#ffffff;
+    --bg-soft:#f7f5fc;
+    --card:#ffffff;
+    --grad:linear-gradient(140deg,#8e6cff 0%,#5e34d9 100%);
+    --radius:20px;
+    --shadow:0 24px 60px -28px rgba(67,38,160,.35);
+    --maxw:1080px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang TC","Noto Sans TC",system-ui,sans-serif;
+    color:var(--ink);background:var(--bg);line-height:1.65;
+    -webkit-font-smoothing:antialiased;
+  }
+  a{color:inherit;text-decoration:none}
+  .wrap{max-width:var(--maxw);margin:0 auto;padding:0 24px}
+  .btn{
+    display:inline-flex;align-items:center;gap:9px;border-radius:999px;
+    padding:13px 24px;font-weight:600;font-size:15px;
+    transition:transform .15s ease, box-shadow .2s ease, background .2s ease;cursor:pointer;border:0;
+  }
+  .btn-primary{background:var(--grad);color:#fff;box-shadow:0 10px 30px -10px rgba(94,52,217,.7)}
+  .btn-primary:hover{transform:translateY(-2px);box-shadow:0 16px 38px -10px rgba(94,52,217,.75)}
+  .btn-ghost{background:#f1eefb;color:var(--violet-2)}
+  .btn-ghost:hover{background:#e8e3fa}
+
+  /* NAV */
+  nav{position:sticky;top:0;z-index:50;background:rgba(255,255,255,.82);backdrop-filter:saturate(160%) blur(14px);border-bottom:1px solid var(--line)}
+  nav .wrap{display:flex;align-items:center;justify-content:space-between;height:64px}
+  .brand{display:flex;align-items:center;gap:11px;font-weight:700;font-size:18px}
+  .brand img{width:34px;height:34px;border-radius:9px}
+  .nav-right{display:flex;align-items:center;gap:18px}
+  .nav-link{color:var(--muted);font-size:14px;font-weight:500}
+  .nav-link:hover{color:var(--ink)}
+  .lang{display:flex;border:1px solid var(--line);border-radius:999px;overflow:hidden;font-size:13px}
+  .lang button{border:0;background:transparent;padding:6px 12px;cursor:pointer;color:var(--muted);font-weight:600;font-family:inherit}
+  .lang button.on{background:var(--violet);color:#fff}
+
+  /* HERO */
+  .hero{padding:84px 0 40px;text-align:center;position:relative;overflow:hidden}
+  .hero::before{content:"";position:absolute;inset:0;background:radial-gradient(620px 360px at 50% -8%,rgba(124,92,255,.18),transparent 70%);pointer-events:none}
+  .hero .appicon{width:104px;height:104px;border-radius:24px;box-shadow:var(--shadow);margin-bottom:26px}
+  h1{font-size:clamp(34px,5.4vw,58px);line-height:1.08;letter-spacing:-.02em;font-weight:800;max-width:760px;margin:0 auto}
+  h1 .hl{background:var(--grad);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+  .sub{margin:22px auto 0;max-width:560px;color:var(--muted);font-size:clamp(16px,2vw,19px)}
+  .cta{margin-top:34px;display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
+  .meta{margin-top:18px;font-size:13px;color:var(--muted)}
+  .meta b{color:var(--ink);font-weight:600}
+
+  /* DEMO */
+  .demo-stage{margin:54px auto 0;max-width:760px}
+  .screen{
+    position:relative;aspect-ratio:16/10;border-radius:18px;
+    background:linear-gradient(160deg,#241b3d,#140f24);border:1px solid #2c2347;
+    box-shadow:var(--shadow);overflow:hidden;
+  }
+  .menubar{position:absolute;top:0;left:0;right:0;height:26px;background:rgba(255,255,255,.07);display:flex;align-items:center;justify-content:flex-end;gap:14px;padding:0 12px;font-size:12px;color:rgba(255,255,255,.7)}
+  .menubar .pad{font-size:13px;transition:transform .3s}
+  .menubar .clock{font-variant-numeric:tabular-nums}
+  .corner{
+    position:absolute;width:78px;height:78px;display:flex;align-items:center;justify-content:center;
+    font-size:11px;color:rgba(255,255,255,.5);transition:.4s ease;
+  }
+  .corner span{display:flex;flex-direction:column;align-items:center;gap:5px;text-align:center;line-height:1.2}
+  .corner .ic{width:30px;height:30px;border-radius:8px;background:rgba(124,92,255,.22);border:1px solid rgba(124,92,255,.4);display:flex;align-items:center;justify-content:center;font-size:15px;transition:.4s}
+  .corner.tl{top:30px;left:8px}.corner.tr{top:30px;right:8px}
+  .corner.bl{bottom:8px;left:8px}.corner.br{bottom:8px;right:8px}
+  .game-label{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;color:#fff;opacity:0;transition:.4s;pointer-events:none}
+  .game-label .big{font-size:34px}
+  .game-label .txt{font-size:14px;color:rgba(255,255,255,.7);letter-spacing:.04em}
+  /* ON state */
+  .screen.on{background:linear-gradient(160deg,#3a2566,#1c1430)}
+  .screen.on .corner{opacity:.28;transform:scale(.92)}
+  .screen.on .corner .ic{background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.12);filter:grayscale(1)}
+  .screen.on .game-label{opacity:1}
+  .screen.on .menubar .pad{transform:scale(1.25)}
+  .demo-ctrl{display:flex;align-items:center;justify-content:center;gap:14px;margin-top:22px;flex-wrap:wrap}
+  .toggle{display:inline-flex;align-items:center;gap:10px;font-weight:600;cursor:pointer;user-select:none}
+  .switch{width:50px;height:28px;border-radius:999px;background:#d8d2ea;position:relative;transition:.25s}
+  .switch::after{content:"";position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.25);transition:.25s}
+  .toggle.on .switch{background:var(--violet)}
+  .toggle.on .switch::after{transform:translateX(22px)}
+  .demo-hint{font-size:13px;color:var(--muted)}
+
+  /* SECTIONS */
+  section.block{padding:88px 0}
+  .block.soft{background:var(--bg-soft)}
+  .eyebrow{display:inline-block;font-size:13px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--violet);margin-bottom:14px}
+  h2{font-size:clamp(26px,3.6vw,38px);letter-spacing:-.02em;font-weight:800;line-height:1.15}
+  .lead{color:var(--muted);font-size:17px;margin-top:14px;max-width:560px}
+  .center{text-align:center}.center .lead{margin-left:auto;margin-right:auto}
+
+  /* STEPS */
+  .steps{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;margin-top:50px}
+  .step{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:30px 26px;position:relative}
+  .step .num{width:34px;height:34px;border-radius:10px;background:var(--grad);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:15px;margin-bottom:18px}
+  .step h3{font-size:18px;margin-bottom:8px}
+  .step p{color:var(--muted);font-size:14.5px}
+  .step code{background:#f1eefb;color:var(--violet-2);padding:1px 6px;border-radius:6px;font-size:12.5px}
+
+  /* FEATURES */
+  .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-top:50px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:28px 24px;transition:.2s}
+  .card:hover{transform:translateY(-4px);box-shadow:var(--shadow);border-color:#e0d9f5}
+  .card .emoji{font-size:26px;display:block;margin-bottom:14px}
+  .card h3{font-size:17px;margin-bottom:7px}
+  .card p{color:var(--muted);font-size:14.5px}
+
+  /* NOTE */
+  .note{max-width:660px;margin:0 auto;text-align:center}
+  .note p{color:#413c4f;font-size:18px;margin-top:16px}
+  .note .sig{margin-top:24px;color:var(--muted);font-size:15px}
+  .author{display:inline-flex;align-items:center;gap:12px;margin-top:28px;padding:8px 16px 8px 8px;border:1px solid var(--line);border-radius:999px;transition:.2s}
+  .author:hover{border-color:#e0d9f5;box-shadow:var(--shadow);transform:translateY(-2px)}
+  .author img{width:42px;height:42px;border-radius:50%;background:var(--bg-soft)}
+  .author .who{display:flex;flex-direction:column;align-items:flex-start;line-height:1.3}
+  .author .who b{font-size:15px;color:var(--ink)}
+  .author .who small{font-size:12.5px;color:var(--muted)}
+
+  /* INSTALL */
+  .install-box{max-width:680px;margin:36px auto 0;background:#1a1430;border-radius:var(--radius);padding:6px;box-shadow:var(--shadow)}
+  .install-box .bar{display:flex;gap:7px;padding:13px 16px}
+  .install-box .bar i{width:11px;height:11px;border-radius:50%;display:block}
+  .install-box .bar i:nth-child(1){background:#ff5f57}.install-box .bar i:nth-child(2){background:#febc2e}.install-box .bar i:nth-child(3){background:#28c840}
+  .install-box pre{padding:6px 22px 22px;color:#e8e3fa;font-size:13.5px;line-height:1.9;overflow-x:auto;font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+  .install-box .c{color:#9a8fc4}
+
+  /* FOOTER */
+  footer{border-top:1px solid var(--line);padding:38px 0;color:var(--muted);font-size:14px}
+  footer .wrap{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:14px}
+  footer a{color:var(--muted)}footer a:hover{color:var(--ink)}
+  .foot-links{display:flex;gap:20px}
+
+  @media(max-width:760px){
+    .steps,.grid{grid-template-columns:1fr}
+    section.block{padding:60px 0}
+    .hero{padding:56px 0 20px}
+    .nav-link.hide-sm{display:none}
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="wrap">
+    <a class="brand" href="#top"><img src="icon.png" alt="Gamely"><span>Gamely</span></a>
+    <div class="nav-right">
+      <a class="nav-link hide-sm" href="#how" data-i="nav.how">運作原理</a>
+      <a class="nav-link hide-sm" href="#features" data-i="nav.features">功能</a>
+      <a class="nav-link" href="https://github.com/rocavence/Gamely-app" target="_blank" rel="noopener">GitHub</a>
+      <div class="lang">
+        <button data-lang="zh" class="on">中</button>
+        <button data-lang="en">EN</button>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<header class="hero" id="top">
+  <div class="wrap">
+    <img class="appicon" src="icon.png" alt="Gamely app icon">
+    <h1 data-i="hero.h1">遊戲全開的時候，<br><span class="hl">別讓滑鼠滑到角落出事</span></h1>
+    <p class="sub" data-i="hero.sub">macOS Game Mode 一啟動，Gamely 就自動關閉四個 Hot Corners；遊戲結束，再把你原本的設定原封不動還原。全程在背景，只有選單列一個 🎮。</p>
+    <div class="cta">
+      <a class="btn btn-primary" href="https://github.com/rocavence/Gamely-app/releases/latest" target="_blank" rel="noopener">
+        <span>⬇︎</span><span data-i="hero.download">下載 Gamely</span>
+      </a>
+      <a class="btn btn-ghost" href="https://github.com/rocavence/Gamely-app" target="_blank" rel="noopener" data-i="hero.source">原始碼 · MIT</a>
+    </div>
+    <p class="meta"><b>macOS 14+</b> · <span data-i="hero.meta">自簽免費 App · v0.1.8</span></p>
+
+    <!-- INTERACTIVE DEMO -->
+    <div class="demo-stage">
+      <div class="screen" id="screen">
+        <div class="menubar"><span class="pad">🎮</span><span class="clock">22:41</span></div>
+        <div class="corner tl"><span><span class="ic">🗂️</span><span data-i="demo.tl">Mission Control</span></span></div>
+        <div class="corner tr"><span><span class="ic">🖥️</span><span data-i="demo.tr">桌面</span></span></div>
+        <div class="corner bl"><span><span class="ic">📝</span><span data-i="demo.bl">快速備忘錄</span></span></div>
+        <div class="corner br"><span><span class="ic">🌙</span><span data-i="demo.br">螢幕保護</span></span></div>
+        <div class="game-label"><span class="big">🎮</span><span class="txt" data-i="demo.gameon">GAME MODE · Hot Corners 已暫停</span></div>
+      </div>
+      <div class="demo-ctrl">
+        <label class="toggle" id="toggle">
+          <span class="switch"></span><span data-i="demo.toggle">模擬 Game Mode</span>
+        </label>
+        <span class="demo-hint" data-i="demo.hint">← 打開看看四個角落會發生什麼事</span>
+      </div>
+    </div>
+  </div>
+</header>
+
+<section class="block soft" id="how">
+  <div class="wrap center">
+    <span class="eyebrow" data-i="how.eyebrow">運作原理</span>
+    <h2 data-i="how.h2">三件事，全自動發生</h2>
+    <p class="lead" data-i="how.lead">沒有公開的 Game Mode API，Gamely 靠系統 unified log 可靠偵測，再讀寫 Dock 偏好設定，全部不需要你動手。</p>
+    <div class="steps" style="text-align:left">
+      <div class="step">
+        <div class="num">1</div>
+        <h3 data-i="how.s1h">偵測 Game Mode</h3>
+        <p data-i="how.s1p">監看 <code>log stream</code>，當 <code>gamepolicyd</code> 印出「Game mode is on」就知道全螢幕遊戲開始了。</p>
+      </div>
+      <div class="step">
+        <div class="num">2</div>
+        <h3 data-i="how.s2h">暫停四個角落</h3>
+        <p data-i="how.s2p">先把你目前的 Hot Corner 設定存起來，把四角設成「無動作」，<code>killall Dock</code> 套用——遊戲全螢幕你看不見。</p>
+      </div>
+      <div class="step">
+        <div class="num">3</div>
+        <h3 data-i="how.s3h">原封不動還原</h3>
+        <p data-i="how.s3p">遊戲一結束就把原值寫回。就算 Gamely 中途崩潰，下次啟動也會自動還原——保證不留爛攤子。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="block" id="features">
+  <div class="wrap center">
+    <span class="eyebrow" data-i="feat.eyebrow">功能</span>
+    <h2 data-i="feat.h2">小到你會忘記它在</h2>
+    <p class="lead" data-i="feat.lead">該做的事做好，其他什麼都不打擾。</p>
+    <div class="grid" style="text-align:left">
+      <div class="card"><span class="emoji">🎯</span><h3 data-i="feat.c1h">跟隨系統 Game Mode</h3><p data-i="feat.c1p">不靠猜測、不掃描程序，完全跟著 macOS 官方的 Game Mode 開關走。</p></div>
+      <div class="card"><span class="emoji">↩️</span><h3 data-i="feat.c2h">精準還原</h3><p data-i="feat.c2p">連修飾鍵設定都一起記住，遊戲結束後你的四角和原本一模一樣。</p></div>
+      <div class="card"><span class="emoji">🛟</span><h3 data-i="feat.c3h">崩潰也安全</h3><p data-i="feat.c3p">原值存在自己的偏好裡，意外結束後下次啟動會偵測並自動補還原。</p></div>
+      <div class="card"><span class="emoji">🚀</span><h3 data-i="feat.c4h">開機自動啟動</h3><p data-i="feat.c4p">用 SMAppService 註冊登入項目，裝一次之後就忘了它的存在。</p></div>
+      <div class="card"><span class="emoji">🍔</span><h3 data-i="feat.c5h">只有選單列一個圖示</h3><p data-i="feat.c5p">沒有 Dock 圖示、沒有視窗、不跳通知，背景安靜常駐。</p></div>
+      <div class="card"><span class="emoji">🔀</span><h3 data-i="feat.c6h">隨時可關</h3><p data-i="feat.c6p">總開關一關 Gamely 就完全不動作，也能手動立刻還原 Hot Corners。</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="block soft">
+  <div class="wrap center">
+    <span class="eyebrow" data-i="inst.eyebrow">安裝</span>
+    <h2 data-i="inst.h2">拖進「應用程式」就好</h2>
+    <p class="lead" data-i="inst.lead">下載解壓、拖進去。自簽 App 第一次打開用右鍵 → 打開，或跑下面這行清掉 quarantine。</p>
+    <div class="install-box">
+      <div class="bar"><i></i><i></i><i></i></div>
+      <pre><span class="c"># <span data-i="inst.cmt">清除 quarantine 後直接打開</span></span>
+xattr -dr com.apple.quarantine /Applications/Gamely.app
+open /Applications/Gamely.app</pre>
+    </div>
+    <div class="cta" style="margin-top:30px">
+      <a class="btn btn-primary" href="https://github.com/rocavence/Gamely-app/releases/latest" target="_blank" rel="noopener"><span>⬇︎</span><span data-i="inst.btn">下載最新版</span></a>
+    </div>
+  </div>
+</section>
+
+<section class="block">
+  <div class="wrap">
+    <div class="note">
+      <span class="eyebrow" data-i="note.eyebrow">寫在最後</span>
+      <p data-i="note.p1">我自己玩遊戲時，滑鼠滑到角落跳出 Mission Control 真的會氣到。系統有 Game Mode 卻不管 Hot Corners，那就自己補一個。</p>
+      <p data-i="note.p2">Gamely 很小、開源、免費。如果它也幫你擋掉了那一下掃興，那就值得了。</p>
+      <a class="sig author" href="https://github.com/rocavence" target="_blank" rel="noopener">
+        <img src="avatar.png" alt="rocavence" loading="lazy">
+        <span class="who"><b>@rocavence</b><small data-i="note.role">作者 · GitHub</small></span>
+      </a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="brand" style="font-size:15px"><img src="icon.png" alt="" style="width:24px;height:24px;border-radius:7px"><span>Gamely</span></div>
+    <div class="foot-links">
+      <a href="https://github.com/rocavence/Gamely-app" target="_blank" rel="noopener">GitHub</a>
+      <a href="https://github.com/rocavence/Gamely-app/releases/latest" target="_blank" rel="noopener" data-i="foot.dl">下載</a>
+      <a href="https://github.com/rocavence/Gamely-app/blob/main/README.md" target="_blank" rel="noopener" data-i="foot.docs">說明</a>
+    </div>
+    <span>© 2026 · MIT · <span data-i="foot.by">作者</span> <a href="https://github.com/rocavence" target="_blank" rel="noopener">@rocavence</a></span>
+  </div>
+</footer>
+
+<script>
+const I18N = {
+  zh:{
+    "nav.how":"運作原理","nav.features":"功能",
+    "hero.h1":'遊戲全開的時候，<br><span class="hl">別讓滑鼠滑到角落出事</span>',
+    "hero.sub":"macOS Game Mode 一啟動，Gamely 就自動關閉四個 Hot Corners；遊戲結束，再把你原本的設定原封不動還原。全程在背景，只有選單列一個 🎮。",
+    "hero.download":"下載 Gamely","hero.source":"原始碼 · MIT","hero.meta":"自簽免費 App · v0.1.8",
+    "demo.tl":"Mission Control","demo.tr":"桌面","demo.bl":"快速備忘錄","demo.br":"螢幕保護",
+    "demo.gameon":"GAME MODE · Hot Corners 已暫停","demo.toggle":"模擬 Game Mode","demo.hint":"← 打開看看四個角落會發生什麼事",
+    "how.eyebrow":"運作原理","how.h2":"三件事，全自動發生",
+    "how.lead":"沒有公開的 Game Mode API，Gamely 靠系統 unified log 可靠偵測，再讀寫 Dock 偏好設定，全部不需要你動手。",
+    "how.s1h":"偵測 Game Mode","how.s1p":'監看 <code>log stream</code>，當 <code>gamepolicyd</code> 印出「Game mode is on」就知道全螢幕遊戲開始了。',
+    "how.s2h":"暫停四個角落","how.s2p":'先把你目前的 Hot Corner 設定存起來，把四角設成「無動作」，<code>killall Dock</code> 套用——遊戲全螢幕你看不見。',
+    "how.s3h":"原封不動還原","how.s3p":"遊戲一結束就把原值寫回。就算 Gamely 中途崩潰，下次啟動也會自動還原——保證不留爛攤子。",
+    "feat.eyebrow":"功能","feat.h2":"小到你會忘記它在","feat.lead":"該做的事做好，其他什麼都不打擾。",
+    "feat.c1h":"跟隨系統 Game Mode","feat.c1p":"不靠猜測、不掃描程序，完全跟著 macOS 官方的 Game Mode 開關走。",
+    "feat.c2h":"精準還原","feat.c2p":"連修飾鍵設定都一起記住，遊戲結束後你的四角和原本一模一樣。",
+    "feat.c3h":"崩潰也安全","feat.c3p":"原值存在自己的偏好裡，意外結束後下次啟動會偵測並自動補還原。",
+    "feat.c4h":"開機自動啟動","feat.c4p":"用 SMAppService 註冊登入項目，裝一次之後就忘了它的存在。",
+    "feat.c5h":"只有選單列一個圖示","feat.c5p":"沒有 Dock 圖示、沒有視窗、不跳通知，背景安靜常駐。",
+    "feat.c6h":"隨時可關","feat.c6p":"總開關一關 Gamely 就完全不動作，也能手動立刻還原 Hot Corners。",
+    "inst.eyebrow":"安裝","inst.h2":"拖進「應用程式」就好",
+    "inst.lead":"下載解壓、拖進去。自簽 App 第一次打開用右鍵 → 打開，或跑下面這行清掉 quarantine。",
+    "inst.cmt":"清除 quarantine 後直接打開","inst.btn":"下載最新版",
+    "note.eyebrow":"寫在最後",
+    "note.p1":"我自己玩遊戲時，滑鼠滑到角落跳出 Mission Control 真的會氣到。系統有 Game Mode 卻不管 Hot Corners，那就自己補一個。",
+    "note.p2":"Gamely 很小、開源、免費。如果它也幫你擋掉了那一下掃興，那就值得了。",
+    "foot.dl":"下載","foot.docs":"說明","foot.by":"作者","note.role":"作者 · GitHub"
+  },
+  en:{
+    "nav.how":"How it works","nav.features":"Features",
+    "hero.h1":'Don\'t let a stray mouse <br><span class="hl">ruin your fullscreen game</span>',
+    "hero.sub":"The moment macOS Game Mode turns on, Gamely disables all four Hot Corners—and restores them exactly when the game ends. Runs in the background as a single 🎮 in the menu bar.",
+    "hero.download":"Download Gamely","hero.source":"Source · MIT","hero.meta":"Free self-signed app · v0.1.8",
+    "demo.tl":"Mission Control","demo.tr":"Desktop","demo.bl":"Quick Note","demo.br":"Screen Saver",
+    "demo.gameon":"GAME MODE · Hot Corners paused","demo.toggle":"Simulate Game Mode","demo.hint":"← flip it and watch the four corners",
+    "how.eyebrow":"How it works","how.h2":"Three things, all automatic",
+    "how.lead":"There's no public Game Mode API. Gamely detects it reliably from the system unified log, then reads and writes Dock preferences—no action needed from you.",
+    "how.s1h":"Detect Game Mode","how.s1p":'Watches <code>log stream</code>; when <code>gamepolicyd</code> prints "Game mode is on", it knows a fullscreen game started.',
+    "how.s2h":"Pause the corners","how.s2p":'Saves your current Hot Corner settings, sets all four to "no action", and applies with <code>killall Dock</code>—invisible while fullscreen.',
+    "how.s3h":"Restore exactly","how.s3p":"Writes your original values back when the game ends. Even if Gamely crashes mid-game, the next launch restores automatically—never any mess.",
+    "feat.eyebrow":"Features","feat.h2":"So small you'll forget it's there","feat.lead":"Does its one job well, and bothers you with nothing else.",
+    "feat.c1h":"Follows system Game Mode","feat.c1p":"No guessing, no process scanning—strictly follows macOS's official Game Mode switch.",
+    "feat.c2h":"Exact restore","feat.c2p":"Remembers even modifier keys, so your corners come back identical after the game.",
+    "feat.c3h":"Crash-safe","feat.c3p":"Originals are stored in its own prefs; an unexpected quit is detected and restored on next launch.",
+    "feat.c4h":"Launch at login","feat.c4p":"Registers a login item via SMAppService—set it once and forget it exists.",
+    "feat.c5h":"Just one menu-bar icon","feat.c5p":"No Dock icon, no window, no notifications. Quiet background presence.",
+    "feat.c6h":"Off whenever","feat.c6p":"Flip the master switch and Gamely does nothing—or restore Hot Corners manually any time.",
+    "inst.eyebrow":"Install","inst.h2":"Just drag it to Applications",
+    "inst.lead":"Download, unzip, drag in. For the self-signed app, open it the first time via right-click → Open, or clear quarantine with the line below.",
+    "inst.cmt":"clear quarantine, then open","inst.btn":"Download latest",
+    "note.eyebrow":"One more thing",
+    "note.p1":"When I game, a stray mouse hitting a corner and popping Mission Control genuinely ruins it. The system has Game Mode but ignores Hot Corners—so I made the missing piece.",
+    "note.p2":"Gamely is tiny, open source, and free. If it spares you that one buzzkill too, it was worth it.",
+    "foot.dl":"Download","foot.docs":"Docs","foot.by":"by","note.role":"Author · GitHub"
+  }
+};
+function setLang(lang){
+  document.documentElement.lang = lang==="zh"?"zh-Hant":"en";
+  document.querySelectorAll("[data-i]").forEach(el=>{
+    const v=I18N[lang][el.getAttribute("data-i")];
+    if(v!=null) el.innerHTML=v;
+  });
+  document.querySelectorAll(".lang button").forEach(b=>b.classList.toggle("on",b.dataset.lang===lang));
+  try{localStorage.setItem("gamely-lang",lang)}catch(e){}
+}
+document.querySelectorAll(".lang button").forEach(b=>b.onclick=()=>setLang(b.dataset.lang));
+let saved=null;
+try{saved=localStorage.getItem("gamely-lang");}catch(e){}
+if(!saved) saved=(navigator.language||"").toLowerCase().startsWith("zh")?"zh":"en";
+setLang(saved==="en"?"en":"zh");
+
+// demo toggle
+const tg=document.getElementById("toggle"), sc=document.getElementById("screen");
+tg.onclick=()=>{tg.classList.toggle("on");sc.classList.toggle("on");};
+</script>
+</body>
+</html>
