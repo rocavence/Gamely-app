@@ -10,7 +10,11 @@ MACOS_DIR="${CONTENTS}/MacOS"
 RES_DIR="${CONTENTS}/Resources"
 
 echo "→ swift build (release)"
-swift build -c release
+# Native build system on purpose: SwiftPM 6.4's default (swift-build) stamps
+# LC_BUILD_VERSION with sdk = deployment target (14.0), so AppKit treats the app
+# as an old binary and skips the current SDK's look. Native stamps the real SDK
+# (27.0). Re-check with `vtool -show-build` before dropping this flag.
+swift build -c release --build-system native
 
 echo "→ assembling bundle at ${APP_DIR}"
 rm -rf "${APP_DIR}"
