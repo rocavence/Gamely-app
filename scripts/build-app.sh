@@ -8,6 +8,7 @@ set -euo pipefail
 cd "$(dirname "$0")/.."
 
 xcodegen generate --quiet
+python3 scripts/site/build.py   # 官網版本號跟著 project.yml
 xcodebuild -project Gamely.xcodeproj -scheme Gamely -configuration Release \
   -derivedDataPath build/xcode.noindex build | grep -E "error:|BUILD" || true
 

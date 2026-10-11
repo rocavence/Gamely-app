@@ -3,10 +3,16 @@
         xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
     <loc>https://gamely.rocavence.com/</loc>
-    <changefreq>monthly</changefreq>
-    <priority>1.0</priority>
+    <lastmod>2026-10-11</lastmod>
     <xhtml:link rel="alternate" hreflang="zh-Hant" href="https://gamely.rocavence.com/"/>
-    <xhtml:link rel="alternate" hreflang="en" href="https://gamely.rocavence.com/"/>
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://gamely.rocavence.com/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://gamely.rocavence.com/en/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://gamely.rocavence.com/en/"/>
+  </url>
+  <url>
+    <loc>https://gamely.rocavence.com/en/</loc>
+    <lastmod>2026-10-11</lastmod>
+    <xhtml:link rel="alternate" hreflang="zh-Hant" href="https://gamely.rocavence.com/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://gamely.rocavence.com/en/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://gamely.rocavence.com/en/"/>
   </url>
 </urlset>
