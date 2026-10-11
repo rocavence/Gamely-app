@@ -12,8 +12,8 @@ rm -rf "$OUT" && mkdir -p "$OUT/shots"
 
 xcodegen generate --quiet
 xcodebuild -project Gamely.xcodeproj -scheme Gamely -configuration Debug \
-  -derivedDataPath build build | grep -E "error:|BUILD FAILED" || true
-APP=build/Build/Products/Debug/Gamely.app/Contents/MacOS/Gamely
+  -derivedDataPath build/xcode.noindex build | grep -E "error:|BUILD FAILED" || true
+APP=build/xcode.noindex/Build/Products/Debug/Gamely.app/Contents/MacOS/Gamely
 
 APPEARANCE=()
 [[ -n "${GAMELY_APPEARANCE:-}" ]] && APPEARANCE=(-Gamely.appearance "$GAMELY_APPEARANCE")

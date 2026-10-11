@@ -51,8 +51,7 @@ Gamely 是自簽 app(未經 Apple 公證),第一次打開可能被擋。用 **�
 git clone https://github.com/rocavence/Gamely-app.git
 cd Gamely-app
 brew install xcodegen
-./scripts/build-app.sh
-open dist/Gamely.app
+./scripts/build-app.sh --install   # 打包 dist/Gamely-<版本>.zip，並裝到「應用程式」
 ```
 需要 Xcode 與 XcodeGen。改圖示：`./scripts/icon/make-icon.sh`。
 </details>

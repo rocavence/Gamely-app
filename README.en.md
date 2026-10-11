@@ -51,8 +51,7 @@ Gamely is self-signed (not notarized by Apple), so the first launch may be block
 git clone https://github.com/rocavence/Gamely-app.git
 cd Gamely-app
 brew install xcodegen
-./scripts/build-app.sh
-open dist/Gamely.app
+./scripts/build-app.sh --install   # builds dist/Gamely-<version>.zip and installs it in Applications
 ```
 Requires Xcode and XcodeGen. To change the icon: `./scripts/icon/make-icon.sh`.
 </details>

@@ -15,7 +15,7 @@ sys.path.insert(0, str(Path(__file__).parent))
 from translations import LANGS, T  # noqa: E402
 
 CATALOG = ROOT / "Gamely/Resources/Localizable.xcstrings"
-EXTRACTED = ROOT / "build/Build/Intermediates.noindex/Gamely.build/Debug/Gamely.build/Objects-normal/arm64"
+EXTRACTED = ROOT / "build/xcode.noindex/Build/Intermediates.noindex/Gamely.build/Debug/Gamely.build/Objects-normal/arm64"
 
 
 def extracted() -> dict[str, str]:
