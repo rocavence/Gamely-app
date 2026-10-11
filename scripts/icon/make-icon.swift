@@ -60,9 +60,9 @@ func white(_ image: NSImage, side: CGFloat) -> CGImage? {
     return img.cgImage(forProposedRect: &rr, context: nil, hints: nil)
 }
 
-if let glyph = white(svg, side: 640) {
+if let glyph = white(svg, side: 500) {
     // With the box widened, the drawing (y -1.05…21.05) sits centred in it.
-    let side: CGFloat = 640
+    let side: CGFloat = 500
     let dst = CGRect(x: (size - side) / 2, y: (size - side) / 2, width: side, height: side)
     ctx.saveGState()
     ctx.setShadow(offset: CGSize(width: 0, height: -14), blur: 36,
