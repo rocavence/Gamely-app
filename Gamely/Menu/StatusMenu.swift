@@ -122,12 +122,13 @@ final class StatusMenu: NSObject, NSMenuDelegate {
         statusItem.button?.image = Self.menuBarIcon(filled: filled)
     }
 
-    /// The bold gamepad, drawn 1.5pt lower so it sits on the menu bar's
-    /// optical centre (the glyph's cable leaves its box top-heavy).
+    /// The bold gamepad at 95% size, its top 1.5pt below the image's top so it
+    /// sits on the menu bar's optical centre (the glyph's cable leaves its box top-heavy).
     private static func menuBarIcon(filled: Bool) -> NSImage {
         let glyph = Icon.nsImage(.gamepad3Bold, weight: filled ? .filled : .outline, size: 18)
         let image = NSImage(size: NSSize(width: 18, height: 18), flipped: false) { rect in
-            glyph.draw(in: rect.offsetBy(dx: 0, dy: -1.5))
+            let side = rect.width * 0.95
+            glyph.draw(in: NSRect(x: (rect.width - side) / 2, y: rect.maxY - 1.5 - side, width: side, height: side))
             return true
         }
         image.isTemplate = true

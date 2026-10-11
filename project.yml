@@ -10,7 +10,7 @@ settings:
     SWIFT_VERSION: "6.0"
     # 版本號只改這裡
     MARKETING_VERSION: "0.5.2"
-    CURRENT_PROJECT_VERSION: "13"
+    CURRENT_PROJECT_VERSION: "14"
   configs:
     Release:
       DEAD_CODE_STRIPPING: YES
