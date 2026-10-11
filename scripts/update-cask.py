@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import json
 import os
+import re
 import subprocess
 import sys
 from pathlib import Path
@@ -61,6 +62,11 @@ def main() -> int:
     sha256 = ((asset or {}).get("digest") or "").removeprefix("sha256:")
     if not sha256:
         print(f"v{version} 缺少 Gamely-{version}.zip 或 sha256", file=sys.stderr)
+        return 1
+
+    # 版本與 sha256 會寫進 Ruby 程式碼，只接受預期的格式，避免被竄改的 release 注入程式碼
+    if not re.fullmatch(r"\d+(\.\d+){1,3}", version) or not re.fullmatch(r"[0-9a-f]{64}", sha256):
+        print(f"版本或 sha256 格式不對：{version!r} {sha256!r}", file=sys.stderr)
         return 1
 
     cask = CASK.format(version=version, sha256=sha256)
