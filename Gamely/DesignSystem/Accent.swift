@@ -44,3 +44,21 @@ enum Accent: String, CaseIterable, Sendable {
         Color(.sRGB, red: Double(hex >> 16 & 0xFF) / 255, green: Double(hex >> 8 & 0xFF) / 255, blue: Double(hex & 0xFF) / 255)
     }
 }
+
+/// The accent as text. On a dark background the saturated accents (Gamely
+/// purple, Klein blue…) fall below a readable contrast, so text lifts them a
+/// third of the way to white; fills keep the accent as is.
+struct AccentText: ShapeStyle {
+    func resolve(in environment: EnvironmentValues) -> Color {
+        let raw = UserDefaults.standard.string(forKey: Accent.key).flatMap(Accent.init) ?? .gamely
+        guard environment.colorScheme == .dark,
+              let lifted = NSColor(raw.color).usingColorSpace(.sRGB)?.blended(withFraction: 0.35, of: .white) else {
+            return raw.color
+        }
+        return Color(nsColor: lifted)
+    }
+}
+
+extension ShapeStyle where Self == AccentText {
+    static var accentText: AccentText { AccentText() }
+}

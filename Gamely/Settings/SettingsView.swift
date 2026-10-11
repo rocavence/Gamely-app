@@ -321,7 +321,7 @@ private struct AboutPage: View {
             case .available(let release):
                 Text("Gamely \(release.version) is available").textStyle(.caption).foregroundStyle(Palette.ink)
                 Button(String(localized: "Download")) { NSWorkspace.shared.open(release.page) }
-                    .buttonStyle(.plain).foregroundStyle(.tint).textStyle(.caption)
+                    .buttonStyle(.plain).foregroundStyle(.accentText).textStyle(.caption)
             case .upToDate:
                 Text("Gamely is up to date.").textStyle(.caption).foregroundStyle(Palette.muted)
                 checkButton
@@ -336,7 +336,7 @@ private struct AboutPage: View {
 
     private var checkButton: some View {
         Button(String(localized: "Check for Updates")) { Task { await updates.check(manual: true) } }
-            .buttonStyle(.plain).foregroundStyle(.tint)
+            .buttonStyle(.plain).foregroundStyle(.accentText)
             .textStyle(.caption)
     }
 
@@ -362,7 +362,7 @@ private struct AboutPage: View {
                     Text(verbatim: name).textStyle(.bodyEmphasis)
                     IconView(.arrowUpRight, size: 11)
                 }
-                .foregroundStyle(.tint)
+                .foregroundStyle(.accentText)
             }
             .buttonStyle(.plain)
             Text(detail).textStyle(.body).foregroundStyle(Palette.muted)

@@ -47,7 +47,7 @@ struct WelcomeView: View {
 
     private func step(_ number: Int, _ title: String, _ detail: String) -> some View {
         HStack(alignment: .top, spacing: Spacing.s12) {
-            Text(verbatim: "\(number)").textStyle(.bodyEmphasis).foregroundStyle(.tint)
+            Text(verbatim: "\(number)").textStyle(.bodyEmphasis).foregroundStyle(.accentText)
                 .frame(width: 24, height: 24)
                 .background(.tint.opacity(0.12), in: Circle())
             VStack(alignment: .leading, spacing: Spacing.s4) {

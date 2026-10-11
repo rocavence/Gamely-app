@@ -89,7 +89,7 @@ struct PillButton: View {
                 if let icon { IconView(icon, size: 14) }
                 Text(title).textStyle(.bodyEmphasis)
             }
-            .foregroundStyle(.tint)
+            .foregroundStyle(.accentText)
             .padding(.horizontal, Spacing.s16)
             .frame(height: 32)
             .background(.tint.opacity(hovering && isEnabled ? 0.2 : 0.12), in: RoundedRectangle(cornerRadius: Radius.ui, style: .continuous))
@@ -121,7 +121,7 @@ struct PillMenu<Value: Hashable>: View {
                 Image(systemName: "chevron.up.chevron.down").font(.system(size: 9, weight: .semibold))
             }
             .textStyle(.bodyEmphasis)
-            .foregroundStyle(.tint)
+            .foregroundStyle(.accentText)
             .padding(.horizontal, Spacing.s12)
             .frame(height: 32)
             .background(.tint.opacity(0.12), in: RoundedRectangle(cornerRadius: Radius.ui, style: .continuous))
