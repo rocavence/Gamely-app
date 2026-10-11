@@ -1,0 +1,88 @@
+#!/usr/bin/env python3
+"""發版後更新 Homebrew tap（rocavence/homebrew-tap）的 Gamely cask：版本與 zip 的 sha256 取自 GitHub 最新的 release。
+
+用法：python3 scripts/update-cask.py          更新並 push
+      python3 scripts/update-cask.py --dry-run  只印出 cask
+tap 的本機位置：環境變數 GAMELY_TAP，預設 ~/Code/_app/homebrew-tap（沒有就 clone）
+"""
+
+from __future__ import annotations
+
+import json
+import os
+import subprocess
+import sys
+from pathlib import Path
+
+REPO = "rocavence/Gamely-app"
+TAP_REPO = "rocavence/homebrew-tap"
+TAP = Path(os.environ.get("GAMELY_TAP", Path.home() / "Code/_app/homebrew-tap"))
+
+CASK = """\
+cask "gamely" do
+  version "{version}"
+  sha256 "{sha256}"
+
+  url "https://github.com/rocavence/Gamely-app/releases/download/v#{{version}}/Gamely-#{{version}}.zip"
+  name "Gamely"
+  desc "Pauses Hot Corners while Game Mode is on"
+  homepage "https://gamely.rocavence.com/"
+
+  livecheck do
+    url :url
+    strategy :github_latest
+  end
+
+  depends_on macos: :sonoma
+
+  app "Gamely.app"
+
+  # Not notarized by Apple: remove the quarantine flag so the first launch isn't blocked.
+  postflight_steps do
+    run "/usr/bin/xattr", args: ["-dr", "com.apple.quarantine", "{{{{appdir}}}}/Gamely.app"]
+  end
+
+  # Quitting Gamely puts the user's Hot Corners back if they're paused.
+  uninstall quit: "com.gamely.app"
+
+  zap trash: "~/Library/Preferences/com.gamely.app.plist"
+end
+"""
+
+
+def run(*args: str, cwd: Path | None = None) -> str:
+    return subprocess.run(args, cwd=cwd, check=True, capture_output=True, text=True).stdout
+
+
+def main() -> int:
+    release = json.loads(run("gh", "api", f"repos/{REPO}/releases/latest"))
+    version = release["tag_name"].removeprefix("v")
+    asset = next((a for a in release["assets"] if a["name"] == f"Gamely-{version}.zip"), None)
+    sha256 = ((asset or {}).get("digest") or "").removeprefix("sha256:")
+    if not sha256:
+        print(f"v{version} 缺少 Gamely-{version}.zip 或 sha256", file=sys.stderr)
+        return 1
+
+    cask = CASK.format(version=version, sha256=sha256)
+    if "--dry-run" in sys.argv:
+        sys.stdout.write(cask)
+        return 0
+
+    if not TAP.exists():
+        run("gh", "repo", "clone", TAP_REPO, str(TAP))
+    run("git", "pull", "--quiet", "--ff-only", cwd=TAP)
+    path = TAP / "Casks/gamely.rb"
+    if path.exists() and path.read_text() == cask:
+        print(f"cask 已經是 {version}")
+        return 0
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(cask)
+    run("git", "add", "Casks/gamely.rb", cwd=TAP)
+    run("git", "commit", "--quiet", "-m", f"gamely {version}", cwd=TAP)
+    run("git", "push", "--quiet", cwd=TAP)
+    print(f"cask 更新為 {version}")
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())

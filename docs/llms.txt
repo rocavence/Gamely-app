@@ -6,6 +6,7 @@
 - Price: Free, open source (MIT license)
 - Author: rocavence (https://github.com/rocavence)
 - Download: https://github.com/rocavence/Gamely-app/releases/latest
+- Homebrew: `brew install --cask rocavence/tap/gamely` (removes the quarantine flag; update with `brew upgrade`)
 - Source code: https://github.com/rocavence/Gamely-app
 - Website: https://gamely.rocavence.com
 

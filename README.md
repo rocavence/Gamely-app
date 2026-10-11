@@ -41,6 +41,12 @@ Hot Corners 存在 Dock 的偏好設定 `wvous-{tl,tr,bl,br}-corner`。Gamely：
 
 ## 安裝
 
+```bash
+brew install --cask rocavence/tap/gamely
+```
+
+用 Homebrew 安裝會自動拿掉隔離標記，之後用 `brew upgrade` 更新。或是手動安裝：
+
 從 [Releases](https://github.com/rocavence/Gamely-app/releases/latest) 下載最新的 `Gamely-x.y.z.zip`,解壓後把 **Gamely.app** 拖進「應用程式」。需要 macOS 14+(Game Mode 自 Sonoma 起)。
 
 Gamely 是自簽 app(未經 Apple 公證),第一次打開可能被擋。用 **右鍵 → 打開**,在對話框再按一次「打開」;或終端機執行 `xattr -dr com.apple.quarantine /Applications/Gamely.app`,再打開。

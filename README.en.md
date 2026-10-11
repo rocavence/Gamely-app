@@ -41,6 +41,12 @@ Registers a login item with `SMAppService.mainApp` (macOS 13+).
 
 ## Install
 
+```bash
+brew install --cask rocavence/tap/gamely
+```
+
+Homebrew removes the quarantine flag for you, and `brew upgrade` keeps it current. Or install by hand:
+
 Download the latest `Gamely-x.y.z.zip` from [Releases](https://github.com/rocavence/Gamely-app/releases/latest), unzip it, and drag **Gamely.app** into `/Applications`. Requires macOS 14+ (Game Mode, since Sonoma).
 
 Gamely is self-signed (not notarized by Apple), so the first launch may be blocked. Allow it with either **Right-click → Open**, then **Open** in the dialog; or Terminal: `xattr -dr com.apple.quarantine /Applications/Gamely.app`, then open it.
