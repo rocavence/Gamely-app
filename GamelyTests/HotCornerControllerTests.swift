@@ -71,4 +71,26 @@ final class HotCornerControllerTests {
         #expect(dock.integer(forKey: "wvous-tl-corner") == 3)
         #expect(restarts.withLock { $0 } == 0)
     }
+
+    @Test func cornerTheUserChangedWhilePausedKeepsTheirSetting() async {
+        dock.set(2, forKey: "wvous-tl-corner")
+        dock.set(5, forKey: "wvous-br-corner")
+        await hc.pause()
+        dock.set(12, forKey: "wvous-br-corner")
+        dock.set(1_048_576, forKey: "wvous-br-modifier")
+
+        #expect(await hc.restore())
+
+        #expect(dock.integer(forKey: "wvous-tl-corner") == 2)
+        #expect(dock.integer(forKey: "wvous-br-corner") == 12)
+        #expect(dock.integer(forKey: "wvous-br-modifier") == 1_048_576)
+        #expect(!hc.isPaused)
+    }
+
+    @Test func realCornersShowTheSavedCopyWhilePaused() async {
+        dock.set(3, forKey: "wvous-tr-corner")
+        #expect(hc.realCorners() == ["wvous-tr-corner": 3])
+        await hc.pause()
+        #expect(hc.realCorners() == ["wvous-tr-corner": 3])
+    }
 }

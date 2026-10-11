@@ -1,0 +1,19 @@
+# Gamely 使用的 Reicon icon（名稱即 Reicon 原名）
+# 新增 icon：加一行後執行 python3 scripts/reicon/generate.py
+
+# 選單列
+gamepad3
+
+# 設定側欄
+setting2
+element
+pulse
+info-circle
+
+# 動作與狀態
+plus
+trash
+refresh
+check-circle
+warning
+arrow-up-right

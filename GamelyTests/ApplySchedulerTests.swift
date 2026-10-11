@@ -36,18 +36,25 @@ struct ApplySchedulerTests {
 
 struct PauseTriggersTests {
     @Test func disabledNeverPauses() {
-        let t = PauseTriggers(gameMode: true, forcedApp: true, manual: true, simulated: true)
+        let t = PauseTriggers(gameMode: true, forcedApp: "Steam", manual: true, simulated: true)
         #expect(!t.shouldPause(enabled: false))
     }
 
     @Test func anyTriggerPausesWhenEnabled() {
         #expect(!PauseTriggers().shouldPause(enabled: true))
         #expect(PauseTriggers(gameMode: true).shouldPause(enabled: true))
-        #expect(PauseTriggers(forcedApp: true).shouldPause(enabled: true))
+        #expect(PauseTriggers(forcedApp: "Steam").shouldPause(enabled: true))
         #expect(PauseTriggers(manual: true).shouldPause(enabled: true))
     }
 
     @Test func manualPauseIsNotDetection() {
         #expect(!PauseTriggers(manual: true).detected)
+    }
+
+    @Test func reasonPrefersGameModeThenForcedApp() {
+        #expect(PauseTriggers().reason == nil)
+        #expect(PauseTriggers(gameMode: true, forcedApp: "Steam", manual: true).reason == .gameMode)
+        #expect(PauseTriggers(forcedApp: "Steam", manual: true).reason == .forcedApp("Steam"))
+        #expect(PauseTriggers(manual: true).reason == .manual)
     }
 }

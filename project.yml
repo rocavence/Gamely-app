@@ -9,8 +9,8 @@ settings:
   base:
     SWIFT_VERSION: "6.0"
     # 版本號只改這裡
-    MARKETING_VERSION: "0.3.0"
-    CURRENT_PROJECT_VERSION: "10"
+    MARKETING_VERSION: "0.5.0"
+    CURRENT_PROJECT_VERSION: "11"
   configs:
     Release:
       DEAD_CODE_STRIPPING: YES
@@ -48,6 +48,9 @@ targets:
         SWIFT_EMIT_LOC_STRINGS: YES
         LOCALIZATION_PREFERS_STRING_CATALOGS: YES
       configs:
+        # 除錯版用自己的 bundle ID：自我測試與除錯不會動到正式版的設定與暫停中的熱角
+        Debug:
+          PRODUCT_BUNDLE_IDENTIFIER: com.gamely.app.debug
         # 自簽憑證沒有 Team ID，除錯版開 hardened runtime 會載不進 Gamely.debug.dylib
         Release:
           ENABLE_HARDENED_RUNTIME: YES

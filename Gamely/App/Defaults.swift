@@ -14,4 +14,26 @@ enum Defaults {
         get { (UserDefaults.standard.array(forKey: "Gamely.whitelist") as? [String]) ?? [] }
         set { UserDefaults.standard.set(newValue, forKey: "Gamely.whitelist") }
     }
+
+    /// Show a banner when Hot Corners are paused or restored. Default off.
+    static var notifies: Bool {
+        get { UserDefaults.standard.bool(forKey: "Gamely.notifies") }
+        set { UserDefaults.standard.set(newValue, forKey: "Gamely.notifies") }
+    }
+
+    /// The first-run guide has been seen.
+    static var onboarded: Bool {
+        get { UserDefaults.standard.bool(forKey: "Gamely.onboarded") }
+        set { UserDefaults.standard.set(newValue, forKey: "Gamely.onboarded") }
+    }
+
+    static var lastPausedAt: Date? {
+        get { UserDefaults.standard.object(forKey: "Gamely.lastPausedAt") as? Date }
+        set { UserDefaults.standard.set(newValue, forKey: "Gamely.lastPausedAt") }
+    }
+
+    static var lastRestoredAt: Date? {
+        get { UserDefaults.standard.object(forKey: "Gamely.lastRestoredAt") as? Date }
+        set { UserDefaults.standard.set(newValue, forKey: "Gamely.lastRestoredAt") }
+    }
 }

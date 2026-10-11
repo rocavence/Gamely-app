@@ -13,9 +13,12 @@ The moment macOS Game Mode turns on, it automatically disables the system Hot Co
 When you're playing a fullscreen game, accidentally sliding the mouse into a screen corner triggers Mission Control / Desktop / Screen Saver—a real buzzkill. Gamely is a small menu-bar utility:
 
 - Detects macOS **Game Mode turning on** → temporarily sets all four **Hot Corners** to "no action"
-- Game Mode **turns off** → **restores your original Hot Corner settings exactly as they were**
-- Supports **launch at login**
-- Runs entirely in the background, with just a single 🎮 icon in the menu bar
+- Game Mode **turns off** → **restores your original Hot Corner settings exactly as they were**; a corner you changed yourself meanwhile keeps your new setting
+- Games that never turn on Game Mode (CrossOver, Whisky, some Steam titles) can be added as **Forced Apps**
+- Restores even after a crash or forced quit: the next launch settles it right away
+- A Settings window, a first-run guide, and a daily check for new versions
+- Six languages: 繁體中文, English, 日本語, 한국어, Español, Português
+- Runs entirely in the background, with just a gamepad icon in the menu bar
 
 ## How it works
 
@@ -56,14 +59,16 @@ Requires Xcode and XcodeGen. To change the icon: `./scripts/icon/make-icon.sh`.
 
 ## Usage
 
-The 🎮 icon in the menu bar:
+The gamepad icon in the menu bar (filled while paused):
 
 | Item | Description |
 |---|---|
-| Game Mode: … | Current state (Off / On — Hot Corners paused) |
+| Status line | What Gamely is doing and why (Game Mode, a forced app, paused by you) |
+| Pause / Restore Hot Corners Now | Pause or restore by hand |
 | Pause Hot Corners in Game Mode | Master switch; turn it off and Gamely won't act |
+| Force Game Mode for Apps | The forced apps list |
 | Launch at Login | Launch automatically at startup |
-| Restore Hot Corners Now | Manual restore (a safety net, shown only while paused) |
+| Settings… | General, Forced Apps, Status, About (check for updates) |
 | Quit Gamely | Quit (restores Hot Corners first) |
 
 ## Tech stack
@@ -86,16 +91,19 @@ Gamely/
 │   ├── Detection/               # Game Mode log parsing and watching, forced-app detection, pause triggers
 │   ├── HotCorners/              # save/disable/restore Hot Corners, debounced scheduling
 │   ├── Menu/                    # menu bar
+│   ├── Settings/                # Settings window (General, Forced Apps, Status, About)
+│   ├── Onboarding/              # first-run guide
+│   ├── DesignSystem/            # type, spacing, radii, colours, accent, Reicon icons
 │   └── Resources/               # Assets.xcassets, Localizable.xcstrings
 ├── GamelyTests/                 # unit tests (Swift Testing)
-└── scripts/                     # build-app.sh, selftest.sh, icon/
+└── scripts/                     # build-app.sh, selftest.sh, icon/, reicon/ (icons), l10n/ (translations)
 ```
 
 ## Tests
 
 ```bash
 xcodebuild test -project Gamely.xcodeproj -scheme Gamely   # unit tests (run xcodegen generate first)
-./scripts/selftest.sh [hotcorners|debounce|menu]           # self-test
+./scripts/selftest.sh [item]                               # self-test (items listed at the top of the script)
 ```
 The self-test drives the app's real controller and menu, but against throwaway preference domains: it never restarts the Dock or touches your real Hot Corners.
 

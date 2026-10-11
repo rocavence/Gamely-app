@@ -49,7 +49,8 @@ struct HotCornerController: Sendable {
 
     /// Put the user's saved Hot Corners back. No-op if we aren't paused.
     @concurrent
-    func restore() async { restoreBlocking() }
+    @discardableResult
+    func restore() async -> Bool { restoreBlocking() }
 
     func pauseBlocking() {
         guard let dock = UserDefaults(suiteName: dockDomain), savedCorners == nil else { return }
@@ -69,22 +70,49 @@ struct HotCornerController: Sendable {
         applyDockChanges(expected: expected)
     }
 
-    /// Synchronous so it can run from `applicationWillTerminate`.
-    func restoreBlocking() {
-        guard let dock = UserDefaults(suiteName: dockDomain), let saved = savedCorners else { return }
+    /// Synchronous so it can run from `applicationWillTerminate` and before a
+    /// power-off. The saved copy is cleared only once the Dock's preferences
+    /// read back as restored, so a failed write is retried next time.
+    @discardableResult
+    func restoreBlocking() -> Bool {
+        guard let dock = UserDefaults(suiteName: dockDomain), let saved = savedCorners else { return true }
 
         var expected: [String: Int?] = [:]
-        for key in Self.keys {
-            if let value = saved[key] {
-                dock.set(value, forKey: key)
-                expected[key] = value
-            } else {
-                dock.removeObject(forKey: key)   // wasn't set originally
-                expected[key] = Int?.none        // expect read-back to be absent
+        for (corner, modifier) in zip(Self.corners, Self.modifiers) {
+            // While paused, both keys of every corner read 0. Anything else means
+            // the user set this corner themselves meanwhile: their choice wins.
+            let changed = [corner, modifier].contains { (dock.object(forKey: $0) as? Int) != 0 }
+            for key in [corner, modifier] {
+                if changed {
+                    expected[key] = dock.object(forKey: key) as? Int
+                } else if let value = saved[key] {
+                    dock.set(value, forKey: key)
+                    expected[key] = value
+                } else {
+                    dock.removeObject(forKey: key)   // wasn't set originally
+                    expected[key] = Int?.none        // expect read-back to be absent
+                }
             }
         }
-        state.removeObject(forKey: Self.savedKey)
-        applyDockChanges(expected: expected)
+        let settled = applyDockChanges(expected: expected)
+        if settled {
+            state.removeObject(forKey: Self.savedKey)
+        } else {
+            log.error("Hot Corners didn't read back as restored; keeping the saved copy")
+        }
+        return settled
+    }
+
+    /// The user's real Hot Corners: the saved copy while paused, otherwise the
+    /// Dock's current settings. Absent keys read as 0.
+    func realCorners() -> [String: Int] {
+        if let savedCorners { return savedCorners }
+        guard let dock = UserDefaults(suiteName: dockDomain) else { return [:] }
+        var corners: [String: Int] = [:]
+        for key in Self.keys where dock.object(forKey: key) != nil {
+            corners[key] = dock.integer(forKey: key)
+        }
+        return corners
     }
 
     /// The Dock only re-reads `wvous-*` on relaunch. During Game Mode the game
@@ -96,13 +124,15 @@ struct HotCornerController: Sendable {
     /// occasionally drops our change. So we force-flush, then read the values
     /// back from a fresh (cfprefsd-backed) handle and confirm they match before
     /// we restart the Dock. Runs off the main thread (see `pause()`/`restore()`).
-    private func applyDockChanges(expected: [String: Int?]) {
+    @discardableResult
+    private func applyDockChanges(expected: [String: Int?]) -> Bool {
         CFPreferencesAppSynchronize(dockDomain as CFString)
 
         // Read back until cfprefsd reports our values, or attempts run out.
+        var settled = false
         for _ in 0..<8 {
             let store = UserDefaults(suiteName: dockDomain)
-            let settled = expected.allSatisfy { key, value in
+            settled = expected.allSatisfy { key, value in
                 if let value {
                     return store?.object(forKey: key) != nil && store?.integer(forKey: key) == value
                 } else {
@@ -113,5 +143,6 @@ struct HotCornerController: Sendable {
             usleep(40_000)   // ~40ms
         }
         restartDock()
+        return settled
     }
 }

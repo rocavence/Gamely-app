@@ -8,3 +8,4 @@ DerivedData/
 /Gamely-*.zip
 *.xcodeproj/
 Config/Signing.local.xcconfig
+/.cache

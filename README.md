@@ -13,9 +13,12 @@ macOS Game Mode 一啟動就自動關閉系統 Hot Corners，遊戲結束再自�
 玩全螢幕遊戲時，滑鼠不小心滑到螢幕角落就觸發 Mission Control / 桌面 / 螢幕保護程式——很掃興。Gamely 是一個常駐選單列的小工具：
 
 - 偵測到 macOS **Game Mode 啟動** → 暫時把四個 **Hot Corners** 設為「無動作」
-- Game Mode **結束** → 把你原本的 Hot Corner 設定**原封不動還原**
-- 支援**開機自動啟動**
-- 全程在背景，只有選單列一個 🎮 圖示
+- Game Mode **結束** → 把你原本的 Hot Corner 設定**原封不動還原**；暫停期間你自己改過的角落，以你的新設定為準
+- 不會觸發 Game Mode 的遊戲（CrossOver、Whisky、部分 Steam 遊戲）可以加進**強制 App**
+- 當機或被強制結束也會還原：下次啟動立刻判斷，沒在玩就還原
+- 設定視窗、第一次使用說明、每天檢查一次新版
+- 六種語言：繁體中文、English、日本語、한국어、Español、Português
+- 全程在背景，只有選單列一個手把圖示
 
 ## 運作原理
 
@@ -56,15 +59,17 @@ open dist/Gamely.app
 
 ## 使用
 
-選單列 🎮 圖示：
+選單列手把圖示（暫停中會變成實心）：
 
 | 項目 | 說明 |
 |---|---|
-| Game Mode: … | 目前狀態（Off / On — Hot Corners paused） |
-| Pause Hot Corners in Game Mode | 總開關；關掉 Gamely 就不動作 |
-| Launch at Login | 開機自動啟動 |
-| Restore Hot Corners Now | 手動還原（保險用，僅在暫停中顯示） |
-| Quit Gamely | 結束（會先還原 Hot Corners） |
+| 狀態列 | 目前在做什麼、為什麼（遊戲模式、強制 App、手動暫停） |
+| 立即暫停熱角／立即還原熱角 | 手動暫停或還原 |
+| 遊戲模式時暫停熱角 | 總開關；關掉 Gamely 就不動作 |
+| 為應用程式強制啟用遊戲模式 | 強制 App 清單 |
+| 登入時啟動 | 開機自動啟動 |
+| 設定⋯ | 一般、強制 App、狀態、關於（檢查更新） |
+| 結束 Gamely | 結束（會先還原熱角） |
 
 ## 技術棧
 
@@ -86,16 +91,19 @@ Gamely/
 │   ├── Detection/               # Game Mode 記錄解析與監聽、強制 App 偵測、暫停條件
 │   ├── HotCorners/              # 存/關/還原 Hot Corners、防抖排程
 │   ├── Menu/                    # 選單列
+│   ├── Settings/                # 設定視窗（一般、強制 App、狀態、關於）
+│   ├── Onboarding/              # 第一次使用說明
+│   ├── DesignSystem/            # 字級、間距、圓角、顏色、重點色、Reicon 圖示
 │   └── Resources/               # Assets.xcassets、Localizable.xcstrings
 ├── GamelyTests/                 # 單元測試（Swift Testing）
-└── scripts/                     # build-app.sh、selftest.sh、icon/
+└── scripts/                     # build-app.sh、selftest.sh、icon/、reicon/（圖示）、l10n/（翻譯表）
 ```
 
 ## 測試
 
 ```bash
 xcodebuild test -project Gamely.xcodeproj -scheme Gamely   # 單元測試（先跑 xcodegen generate）
-./scripts/selftest.sh [hotcorners|debounce|menu]           # 自我測試
+./scripts/selftest.sh [項目]                               # 自我測試（項目見腳本開頭）
 ```
 自我測試會實際操作 app 的控制器與選單，但改的是測試用的偏好設定網域，不會重啟 Dock，也不碰你真正的熱角。
 

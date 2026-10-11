@@ -1,19 +1,19 @@
 import AppKit
 
-/// Watches which app is frontmost and reports whether it's in the user's
+/// Watches which app is frontmost and reports it when it's in the user's
 /// whitelist (`Defaults.whitelist`). Used to force "Game Mode" for apps that
 /// don't trigger real macOS Game Mode — e.g. Steam or CrossOver games.
 @MainActor
 final class ActiveAppMonitor {
-    /// Fired whenever the whitelisted-frontmost state flips.
-    private let onChange: @MainActor (Bool) -> Void
+    /// Fired with the whitelisted frontmost app's name, or nil, whenever it changes.
+    private let onChange: @MainActor (String?) -> Void
 
-    /// Whether the current frontmost app's bundle ID is in the whitelist.
-    private(set) var isActive = false
+    /// The name of the frontmost app when it's whitelisted.
+    private(set) var activeApp: String?
 
     private var observer: NSObjectProtocol?
 
-    init(onChange: @escaping @MainActor (Bool) -> Void) {
+    init(onChange: @escaping @MainActor (String?) -> Void) {
         self.onChange = onChange
     }
 
@@ -37,13 +37,14 @@ final class ActiveAppMonitor {
         }
     }
 
-    /// Recompute from the current frontmost app and fire `onChange` if it flipped.
+    /// Recompute from the current frontmost app and fire `onChange` if it changed.
     /// Call after editing the whitelist so changes take effect immediately.
     func recheck() {
-        let bundleID = NSWorkspace.shared.frontmostApplication?.bundleIdentifier
-        let active = bundleID.map { Defaults.whitelist.contains($0) } ?? false
-        if active != isActive {
-            isActive = active
+        let front = NSWorkspace.shared.frontmostApplication
+        let id = front?.bundleIdentifier
+        let active = id.flatMap { Defaults.whitelist.contains($0) ? (front?.localizedName ?? $0) : nil }
+        if active != activeApp {
+            activeApp = active
             onChange(active)
         }
     }

@@ -7,13 +7,19 @@ final class StatusMenu: NSObject, NSMenuDelegate {
     private unowned let controller: AppController
     private let statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
     private let menu = NSMenu()
+    /// Opens Settings, on a page.
+    var openSettings: (SettingsPage) -> Void = { _ in }
 
     private var statusLine: NSMenuItem!
+    private var detectionItem: NSMenuItem!
+    private var updateItem: NSMenuItem!
     private var enabledItem: NSMenuItem!
     private var loginItem: NSMenuItem!
+    private var loginApprovalItem: NSMenuItem!
     private var whitelistItem: NSMenuItem!
     private var pauseItem: NSMenuItem!
     private var restoreItem: NSMenuItem!
+    private var flashing: Task<Void, Never>?
 
     init(controller: AppController) {
         self.controller = controller
@@ -30,11 +36,18 @@ final class StatusMenu: NSObject, NSMenuDelegate {
                                      action: nil, keyEquivalent: "")
         versionItem.isEnabled = false
         menu.addItem(versionItem)
+
+        updateItem = item("", #selector(openUpdate))
+        menu.addItem(updateItem)
         menu.addItem(.separator())
 
         statusLine = NSMenuItem(title: "", action: nil, keyEquivalent: "")
         statusLine.isEnabled = false
         menu.addItem(statusLine)
+
+        detectionItem = item(String(localized: "Detection stopped. Click to retry", comment: "Menu item shown when Game Mode detection has stopped"), #selector(retryDetection))
+        detectionItem.image = Icon.nsImage(.warning, size: 14)
+        menu.addItem(detectionItem)
         menu.addItem(.separator())
 
         // Immediate "now" actions — only one of the pair shows at a time
@@ -60,12 +73,16 @@ final class StatusMenu: NSObject, NSMenuDelegate {
 
         loginItem = item(String(localized: "Launch at Login", comment: "Toggle: launch Gamely at login"), #selector(toggleLogin))
         menu.addItem(loginItem)
+        loginApprovalItem = item(String(localized: "Allow Gamely in Login Items…", comment: "Shown when macOS needs the user to approve launch at login"), #selector(openLoginItems))
+        loginApprovalItem.image = Icon.nsImage(.warning, size: 14)
+        menu.addItem(loginApprovalItem)
 
         #if DEBUG
         menu.addItem(item(String(localized: "Simulate Game Mode (debug)", comment: "Debug-only action to simulate Game Mode"), #selector(toggleSimulate)))
         #endif
 
         menu.addItem(.separator())
+        menu.addItem(item(String(localized: "Settings…", comment: "Action: open the Settings window"), #selector(showSettings), key: ","))
         menu.addItem(item(String(localized: "Quit Gamely", comment: "Action: quit the app"), #selector(quit), key: "q"))
 
         statusItem.menu = menu
@@ -81,34 +98,57 @@ final class StatusMenu: NSObject, NSMenuDelegate {
     var statusTitle: String { statusLine.title }
 
     func update() {
-        let detected = controller.triggers.detected
         let paused = controller.isPaused
-        let symbol = paused ? "gamecontroller.fill" : "gamecontroller"
-        statusItem.button?.image = NSImage(systemSymbolName: symbol, accessibilityDescription: "Gamely")
+        if flashing == nil { setIcon(filled: paused) }
+        // VoiceOver reads the icon with what Gamely is doing.
+        statusItem.button?.setAccessibilityLabel("Gamely, \(controller.statusText)")
 
-        statusLine.title = detected
-            ? (paused
-                ? String(localized: "Game Mode: On — Hot Corners paused", comment: "Status line: Game Mode active and Hot Corners paused")
-                : String(localized: "Game Mode: On", comment: "Status line: Game Mode active"))
-            : String(localized: "Game Mode: Off", comment: "Status line when Game Mode is not active")
-        enabledItem.state = Defaults.enabled ? .on : .off
-        loginItem.state = LoginItem.isEnabled ? .on : .off
+        statusLine.title = controller.statusText
+        detectionItem.isHidden = controller.detection != .stopped
+        if let release = controller.updates.available {
+            updateItem.title = String(localized: "Gamely \(release.version) is available. Download…", comment: "Menu item when a newer version is out")
+            updateItem.isHidden = false
+        } else {
+            updateItem.isHidden = true
+        }
+        enabledItem.state = controller.enabled ? .on : .off
+        loginItem.state = controller.loginItemEnabled ? .on : .off
+        loginApprovalItem.isHidden = !controller.loginItemNeedsApproval && controller.loginItemError == nil
         pauseItem.isHidden = paused
         restoreItem.isHidden = !paused
+    }
+
+    private func setIcon(filled: Bool) {
+        statusItem.button?.image = Icon.nsImage(.gamepad3, weight: filled ? .filled : .outline, size: 18)
+    }
+
+    /// A short blink between the two icons when Hot Corners are paused or
+    /// restored, so the change is noticed. Skipped with Reduce Motion.
+    func flash(paused: Bool) {
+        guard !NSWorkspace.shared.accessibilityDisplayShouldReduceMotion else { return update() }
+        flashing?.cancel()
+        flashing = Task {
+            for filled in [paused, !paused, paused, !paused, paused] {
+                setIcon(filled: filled)
+                try? await Task.sleep(for: .milliseconds(140))
+            }
+            flashing = nil
+            update()
+        }
     }
 
     /// (Re)build the "Force Game Mode for Apps" submenu from the current whitelist.
     private func rebuildWhitelistMenu(_ menu: NSMenu) {
         menu.removeAllItems()
 
-        for bundleID in Defaults.whitelist {
-            let item = item(friendlyName(for: bundleID), #selector(removeWhitelistApp(_:)))
+        for bundleID in controller.whitelist {
+            let item = item(AppInfo.name(for: bundleID), #selector(removeWhitelistApp(_:)))
             item.representedObject = bundleID
             item.state = .on
             menu.addItem(item)
         }
 
-        if !Defaults.whitelist.isEmpty {
+        if !controller.whitelist.isEmpty {
             menu.addItem(.separator())
         }
 
@@ -117,7 +157,7 @@ final class StatusMenu: NSObject, NSMenuDelegate {
         let addMenu = NSMenu()
         addMenu.autoenablesItems = false
 
-        var seen = Set(Defaults.whitelist)
+        var seen = Set(controller.whitelist)
         seen.insert(Bundle.main.bundleIdentifier ?? "")
         let candidates = NSWorkspace.shared.runningApplications
             .filter { $0.activationPolicy == .regular }
@@ -138,61 +178,40 @@ final class StatusMenu: NSObject, NSMenuDelegate {
                 addMenu.addItem(item)
             }
         }
+        addMenu.addItem(.separator())
+        addMenu.addItem(item(String(localized: "Choose from Applications…", comment: "Opens Settings to pick any installed app"), #selector(showForcedApps)))
         addItem.submenu = addMenu
         menu.addItem(addItem)
     }
 
-    /// A human-friendly name for a bundle ID: the app's localized name if we can
-    /// find it (running or installed), otherwise the raw bundle ID.
-    private func friendlyName(for bundleID: String) -> String {
-        if let running = NSRunningApplication.runningApplications(withBundleIdentifier: bundleID).first,
-           let name = running.localizedName {
-            return name
-        }
-        if let url = NSWorkspace.shared.urlForApplication(withBundleIdentifier: bundleID) {
-            return url.deletingPathExtension().lastPathComponent
-        }
-        return bundleID
-    }
-
     // MARK: - Actions
 
-    @objc private func toggleEnabled() {
-        controller.setEnabled(!Defaults.enabled)
-    }
+    @objc private func toggleEnabled() { controller.enabled.toggle() }
+    @objc private func toggleLogin() { controller.setLoginItem(!controller.loginItemEnabled) }
+    @objc private func openLoginItems() { LoginItem.openSystemSettings() }
+    @objc private func pauseNow() { Task { await controller.pauseNow() } }
+    @objc private func restoreNow() { Task { await controller.restoreNow() } }
+    @objc private func toggleSimulate() { controller.setSimulated(!controller.triggers.simulated) }
+    @objc private func retryDetection() { controller.retryDetection() }
+    @objc private func showSettings() { openSettings(.general) }
+    @objc private func showForcedApps() { openSettings(.forcedApps) }
+    @objc private func quit() { NSApp.terminate(nil) }
 
-    @objc private func toggleLogin() {
-        LoginItem.setEnabled(!LoginItem.isEnabled)
-        update()
-    }
-
-    @objc private func pauseNow() {
-        Task { await controller.pauseNow() }
-    }
-
-    @objc private func restoreNow() {
-        Task { await controller.restoreNow() }
-    }
-
-    @objc private func toggleSimulate() {
-        controller.setSimulated(!controller.triggers.simulated)
+    @objc private func openUpdate() {
+        NSWorkspace.shared.open(controller.updates.available?.page ?? UpdateChecker.releases)
     }
 
     @objc private func removeWhitelistApp(_ sender: NSMenuItem) {
         guard let bundleID = sender.representedObject as? String else { return }
-        Defaults.whitelist.removeAll { $0 == bundleID }
-        controller.whitelistChanged()
+        controller.whitelist.removeAll { $0 == bundleID }
     }
 
     @objc private func addWhitelistApp(_ sender: NSMenuItem) {
         guard let bundleID = sender.representedObject as? String,
               bundleID != Bundle.main.bundleIdentifier,
-              !Defaults.whitelist.contains(bundleID) else { return }
-        Defaults.whitelist.append(bundleID)
-        controller.whitelistChanged()
+              !controller.whitelist.contains(bundleID) else { return }
+        controller.whitelist.append(bundleID)
     }
-
-    @objc private func quit() { NSApp.terminate(nil) }
 
     // MARK: - NSMenuDelegate
 
@@ -200,6 +219,7 @@ final class StatusMenu: NSObject, NSMenuDelegate {
         if menu == whitelistItem.submenu {
             rebuildWhitelistMenu(menu)
         } else {
+            controller.refreshLoginItem()
             update()
         }
     }
