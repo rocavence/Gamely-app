@@ -6,7 +6,7 @@ struct WelcomeView: View {
     let corners: [String: Int]
     var openForcedApps: () -> Void
     var done: () -> Void
-    @AppStorage(Accent.key) private var accent: Accent = .orange
+    @AppStorage(Accent.key) private var accent: Accent = .gamely
 
     var body: some View {
         VStack(alignment: .leading, spacing: Spacing.s20) {

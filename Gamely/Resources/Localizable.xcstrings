@@ -1368,6 +1368,46 @@
       },
       "comment": "Menu item when a newer version is out"
     },
+    "Gamely Purple": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gamely Purple"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gamely 紫"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gamely パープル"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gamely 퍼플"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Morado Gamely"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Roxo Gamely"
+          }
+        }
+      }
+    },
     "Gamely can't read the system log right now, so Game Mode goes unnoticed. Retry; if it keeps stopping, quit and reopen Gamely. Forced apps still work.": {
       "localizations": {
         "en": {

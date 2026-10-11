@@ -35,7 +35,7 @@ struct SettingsView: View {
     let controller: AppController
     @Bindable var navigation: SettingsNavigation
     var showGuide: () -> Void
-    @AppStorage(Accent.key) private var accent: Accent = .orange
+    @AppStorage(Accent.key) private var accent: Accent = .gamely
 
     var body: some View {
         HStack(alignment: .top, spacing: 0) {
@@ -133,7 +133,7 @@ private struct GeneralPage: View {
     var showGuide: () -> Void
     @State private var language = AppLanguage.saved
     @AppStorage(AppAppearance.key) private var appearance: AppAppearance = .system
-    @AppStorage(Accent.key) private var accent: Accent = .orange
+    @AppStorage(Accent.key) private var accent: Accent = .gamely
 
     var body: some View {
         VStack(spacing: 0) {

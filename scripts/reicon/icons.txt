@@ -1,8 +1,8 @@
 # Gamely 使用的 Reicon icon（名稱即 Reicon 原名）
 # 新增 icon：加一行後執行 python3 scripts/reicon/generate.py
 
-# 選單列
-gamepad3
+# 選單列與 App 圖示：gamepad3 加粗版（custom/，由 gamepad3 外描 0.6 產生）
+gamepad3-bold
 
 # 設定側欄
 setting2

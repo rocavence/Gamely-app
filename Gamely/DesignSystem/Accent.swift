@@ -1,16 +1,18 @@
 import SwiftUI
 
 /// The one colour Gamely chooses: the accent. It marks what's chosen and what's
-/// on (the page you're on, a switch, a button) and nothing else. The system's
-/// own accent, or one of seven vivid colours named for the designer or artist
-/// each calls to mind; Rams orange by default. The same set as Wunder.
+/// on (the page you're on, a switch, a button) and nothing else. Gamely purple,
+/// taken from the app icon, by default; or the system's own accent, or one of
+/// the seven vivid colours Wunder offers, each named for the designer or artist
+/// it calls to mind.
 enum Accent: String, CaseIterable, Sendable {
-    case system, orange, red, pink, purple, blue, glacier, green
+    case gamely, system, orange, red, pink, purple, blue, glacier, green
 
     static let key = "Gamely.accent"
 
     var title: String {
         switch self {
+        case .gamely: String(localized: "Gamely Purple")
         case .system: String(localized: "System")
         case .orange: String(localized: "Rams Orange")
         case .red: String(localized: "Matisse Red")
@@ -22,10 +24,11 @@ enum Accent: String, CaseIterable, Sendable {
         }
     }
 
-    /// Braun's orange, Matisse's red studio, Barragán's pink walls, Van Gogh's
+    /// The top of the app icon's gradient; then Braun's orange, Matisse's red studio, Barragán's pink walls, Van Gogh's
     /// irises, Klein's blue, Hockney's pools, Monet's bridge at Giverny.
     var color: Color {
         switch self {
+        case .gamely: Self.rgb(0x7D4FF7)
         case .system: .accentColor
         case .orange: Self.rgb(0xED3F1C)
         case .red: Self.rgb(0xD21F3C)

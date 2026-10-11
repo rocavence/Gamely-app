@@ -71,6 +71,7 @@ T = {
 "System": ["跟隨系統", "システムに合わせる", "시스템 설정", "Sistema", "Sistema"],
 "Light": ["淺色", "ライト", "라이트", "Claro", "Claro"],
 "Dark": ["深色", "ダーク", "다크", "Oscuro", "Escuro"],
+"Gamely Purple": ["Gamely 紫", "Gamely パープル", "Gamely 퍼플", "Morado Gamely", "Roxo Gamely"],
 "Rams Orange": ["拉姆斯橘", "ラムス・オレンジ", "람스 오렌지", "Naranja Rams", "Laranja Rams"],
 "Matisse Red": ["馬諦斯紅", "マティス・レッド", "마티스 레드", "Rojo Matisse", "Vermelho Matisse"],
 "Barragán Pink": ["巴拉岡粉", "バラガン・ピンク", "바라간 핑크", "Rosa Barragán", "Rosa Barragán"],

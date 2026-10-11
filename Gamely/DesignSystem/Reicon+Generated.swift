@@ -2,7 +2,7 @@
 // Reicon commit ceab2340577684a47d8e361172bdbcd75cb8c7f3
 
 enum Reicon: String, CaseIterable, Sendable {
-    case gamepad3 = "gamepad3"
+    case gamepad3Bold = "gamepad3-bold"
     case setting2 = "setting2"
     case element = "element"
     case pulse = "pulse"

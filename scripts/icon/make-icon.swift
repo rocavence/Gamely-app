@@ -1,7 +1,7 @@
 #!/usr/bin/env swift
 //
 // Render Gamely's app icon at 1024×1024 as scripts/icon/icon-1024.png.
-// Run via `swift Scripts/make-icon.swift` from the project root.
+// Run via `scripts/icon/make-icon.sh` from the project root.
 //
 import AppKit
 import CoreGraphics
@@ -38,29 +38,32 @@ ctx.drawLinearGradient(CGGradient(colorsSpace: space, colors: sheen, locations: 
                        end: CGPoint(x: rect.midX, y: rect.midY), options: [])
 ctx.restoreGState()
 
-// White game controller glyph, centered, with a soft drop shadow.
-func whiteSymbol(_ name: String, point: CGFloat) -> CGImage? {
-    let conf = NSImage.SymbolConfiguration(pointSize: point, weight: .semibold)
-    guard let base = NSImage(systemSymbolName: name, accessibilityDescription: nil)?
-        .withSymbolConfiguration(conf) else { return nil }
-    let sz = base.size
-    let img = NSImage(size: sz)
-    img.lockFocus()
-    NSColor.white.set()
-    let r = NSRect(origin: .zero, size: sz)
-    base.draw(in: r)
-    r.fill(using: .sourceAtop)
-    img.unlockFocus()
-    var rr = NSRect(origin: .zero, size: sz)
+// White Reicon gamepad3 (bold), the same glyph as the menu bar, with a soft drop shadow.
+let glyphPath = "Gamely/Resources/Assets.xcassets/Reicon/gamepad3-bold.outline.imageset/gamepad3-bold.outline.svg"
+// Reicon clips the cable's rounded end at the top of its box. Unclip it and
+// widen the box upward 1.5 units so the whole glyph shows.
+guard var source = try? String(contentsOfFile: glyphPath, encoding: .utf8) else {
+    fatalError("missing \(glyphPath); run scripts/reicon/generate.py")
+}
+source = source.replacingOccurrences(of: #" clip-path="url\(#[^)]*\)""#, with: "", options: .regularExpression)
+    .replacingOccurrences(of: #"viewBox="0 0 24 24""#, with: #"viewBox="0 -1.5 24 24""#)
+guard let svg = NSImage(data: Data(source.utf8)) else { fatalError("bad SVG") }
+
+func white(_ image: NSImage, side: CGFloat) -> CGImage? {
+    let img = NSImage(size: NSSize(width: side, height: side), flipped: false) { r in
+        image.draw(in: r)
+        NSColor.white.set()
+        r.fill(using: .sourceAtop)
+        return true
+    }
+    var rr = NSRect(x: 0, y: 0, width: side, height: side)
     return img.cgImage(forProposedRect: &rr, context: nil, hints: nil)
 }
 
-if let glyph = whiteSymbol("gamecontroller.fill", point: 512) {
-    // Scale the glyph to a fixed share of the canvas so the squircle stays visible.
-    let targetWidth: CGFloat = 560
-    let scale = targetWidth / CGFloat(glyph.width)
-    let w = CGFloat(glyph.width) * scale, h = CGFloat(glyph.height) * scale
-    let dst = CGRect(x: (size - w) / 2, y: (size - h) / 2, width: w, height: h)
+if let glyph = white(svg, side: 640) {
+    // With the box widened, the drawing (y -1.05…21.05) sits centred in it.
+    let side: CGFloat = 640
+    let dst = CGRect(x: (size - side) / 2, y: (size - side) / 2, width: side, height: side)
     ctx.saveGState()
     ctx.setShadow(offset: CGSize(width: 0, height: -14), blur: 36,
                   color: NSColor.black.withAlphaComponent(0.25).cgColor)

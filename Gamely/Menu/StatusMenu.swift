@@ -119,7 +119,19 @@ final class StatusMenu: NSObject, NSMenuDelegate {
     }
 
     private func setIcon(filled: Bool) {
-        statusItem.button?.image = Icon.nsImage(.gamepad3, weight: filled ? .filled : .outline, size: 18)
+        statusItem.button?.image = Self.menuBarIcon(filled: filled)
+    }
+
+    /// The bold gamepad, drawn 1.5pt lower so it sits on the menu bar's
+    /// optical centre (the glyph's cable leaves its box top-heavy).
+    private static func menuBarIcon(filled: Bool) -> NSImage {
+        let glyph = Icon.nsImage(.gamepad3Bold, weight: filled ? .filled : .outline, size: 18)
+        let image = NSImage(size: NSSize(width: 18, height: 18), flipped: false) { rect in
+            glyph.draw(in: rect.offsetBy(dx: 0, dy: -1.5))
+            return true
+        }
+        image.isTemplate = true
+        return image
     }
 
     /// A short blink between the two icons when Hot Corners are paused or
