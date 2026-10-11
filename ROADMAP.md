@@ -85,7 +85,7 @@
 
 1. **打包腳本**：`scripts/package.sh` 產生 `Gamely.zip` 與 SHA-256；版本號只在 `project.yml` 改一處；舊 zip 移出專案根目錄。
 2. **更新提示**：每天查一次 GitHub 最新版，在選單與「關於」提供下載連結，不自動安裝。（2026-10-11 提前在 0.5.0 完成）
-3. **Homebrew**：`brew install --cask rocavence/tap/gamely`，安裝時解除隔離；發版後執行腳本更新 cask。
+3. **Homebrew**：`brew install --cask rocavence/tap/gamely`，安裝時解除隔離；發版後執行腳本更新 cask。（2026-10-11 完成：`scripts/update-cask.py`）
 4. **官網**：改用 Wunder 的網站產生器。
    - 六種語言各有自己的網址與 hreflang，不再靠 JavaScript 換字。
    - 加入 App 截圖與「滑到角落沒反應」的互動示範，可用鍵盤操作，尊重「減少動態效果」。
