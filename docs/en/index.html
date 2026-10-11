@@ -11,6 +11,10 @@
 <link rel="canonical" data-i-href="meta.url" href="https://gamely.rocavence.com/en/">
 <link rel="alternate" hreflang="zh-Hant" href="https://gamely.rocavence.com/">
 <link rel="alternate" hreflang="en" href="https://gamely.rocavence.com/en/">
+<link rel="alternate" hreflang="ja" href="https://gamely.rocavence.com/ja/">
+<link rel="alternate" hreflang="ko" href="https://gamely.rocavence.com/ko/">
+<link rel="alternate" hreflang="es" href="https://gamely.rocavence.com/es/">
+<link rel="alternate" hreflang="pt-BR" href="https://gamely.rocavence.com/pt/">
 <link rel="alternate" hreflang="x-default" href="https://gamely.rocavence.com/en/">
 <link rel="alternate" type="text/plain" title="llms.txt" href="/llms.txt">
 <link rel="icon" type="image/png" href="/favicon.png">
@@ -41,7 +45,7 @@
   "applicationCategory": "UtilitiesApplication",
   "applicationSubCategory": "Menu Bar Utility",
   "operatingSystem": "macOS 14.0 or later",
-  "softwareVersion": "0.5.2",
+  "softwareVersion": "0.9.0",
   "description": "Gamely is a free, open-source macOS menu bar utility. When macOS Game Mode turns on, it automatically disables all four Hot Corners so a stray mouse can't trigger Mission Control during fullscreen games, and restores your exact original settings when the game ends.",
   "url": "https://gamely.rocavence.com/en/",
   "image": "https://gamely.rocavence.com/icon.png",
@@ -175,9 +179,15 @@
   .nav-right{display:flex;align-items:center;gap:18px}
   .nav-link{color:var(--muted);font-size:14px;font-weight:500}
   .nav-link:hover{color:var(--ink)}
-  .lang{display:flex;border:1px solid var(--line);border-radius:999px;overflow:hidden;font-size:13px}
-  .lang a{padding:6px 12px;color:var(--muted);font-weight:600}
-  .lang a.on{background:var(--violet);color:#fff}
+  .lang{position:relative;font-size:13px}
+  .lang summary{list-style:none;display:flex;align-items:center;gap:6px;padding:6px 12px;border:1px solid var(--line);border-radius:999px;color:var(--muted);font-weight:600;cursor:pointer;user-select:none}
+  .lang summary::-webkit-details-marker{display:none}
+  .lang summary:hover,.lang[open] summary{color:var(--ink)}
+  .lang[open] .chev{transform:rotate(180deg)}
+  .lang-menu{position:absolute;right:0;top:calc(100% + 6px);min-width:150px;padding:6px;background:#fff;border:1px solid var(--line);border-radius:12px;box-shadow:0 12px 30px rgba(20,16,40,.12);display:flex;flex-direction:column}
+  .lang-menu a{padding:8px 12px;border-radius:8px;color:var(--ink);font-weight:500}
+  .lang-menu a:hover{background:#f1eefb}
+  .lang-menu a.on{color:var(--violet-2);font-weight:700}
 
   /* HERO */
   .hero{padding:84px 0 40px;text-align:center;position:relative;overflow:hidden}
@@ -322,11 +332,18 @@
       <a class="nav-link hide-sm" href="#how" data-i="nav.how">How it works</a>
       <a class="nav-link hide-sm" href="#features" data-i="nav.features">Features</a>
       <a class="nav-link hide-sm" href="#faq" data-i="nav.faq">FAQ</a>
-      <a class="nav-link" href="https://github.com/rocavence/Gamely-app" target="_blank" rel="noopener">GitHub</a>
-      <div class="lang">
-        <a href="/" hreflang="zh-Hant" lang="zh-Hant" data-lang="zh">中</a>
-        <a href="/en/" hreflang="en" lang="en" data-lang="en" class="on">EN</a>
-      </div>
+      <a class="nav-link hide-sm" href="https://github.com/rocavence/Gamely-app" target="_blank" rel="noopener">GitHub</a>
+      <details class="lang">
+        <summary aria-label="Language"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.6 3.8 5.6 3.8 9s-1.3 6.4-3.8 9c-2.5-2.6-3.8-5.6-3.8-9S9.5 5.6 12 3z"/></svg><span data-i="lang.name">English</span><svg class="chev" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></summary>
+        <div class="lang-menu">
+          <a href="/" hreflang="zh-Hant" lang="zh-Hant" data-lang="zh">繁體中文</a>
+          <a href="/en/" hreflang="en" lang="en" data-lang="en" class="on">English</a>
+          <a href="/ja/" hreflang="ja" lang="ja" data-lang="ja">日本語</a>
+          <a href="/ko/" hreflang="ko" lang="ko" data-lang="ko">한국어</a>
+          <a href="/es/" hreflang="es" lang="es" data-lang="es">Español</a>
+          <a href="/pt/" hreflang="pt-BR" lang="pt-BR" data-lang="pt">Português</a>
+        </div>
+      </details>
     </div>
   </div>
 </nav>
@@ -342,7 +359,7 @@
       </a>
       <a class="btn btn-ghost" href="https://github.com/rocavence/Gamely-app" target="_blank" rel="noopener" data-i="hero.source">Source · CC BY-NC-SA</a>
     </div>
-    <p class="meta"><b>macOS 14+</b> · <span data-i="hero.meta">Free self-signed app · v<span class="ver">0.5.2</span></span></p>
+    <p class="meta"><b>macOS 14+</b> · <span data-i="hero.meta">Free self-signed app · v<span class="ver">0.9.0</span></span></p>
 
     <!-- INTERACTIVE DEMO -->
     <div class="demo-stage">
@@ -484,11 +501,18 @@
 <script>
 // 記住使用者點過的語言；瀏覽器語言和這頁不同時，只顯示提示，不自動轉址（避免搜尋引擎被導走）
 document.querySelectorAll(".lang a").forEach(a=>a.addEventListener("click",()=>{try{localStorage.setItem("gamely-lang",a.dataset.lang)}catch(e){}}));
+// 點選單外面或按 Esc 就收起語言選單
+const langMenu=document.querySelector(".lang");
+document.addEventListener("click",e=>{if(langMenu.open&&!langMenu.contains(e.target))langMenu.open=false;});
+document.addEventListener("keydown",e=>{if(e.key==="Escape"&&langMenu.open){langMenu.open=false;langMenu.querySelector("summary").focus();}});
 (()=>{
   let want=null;try{want=localStorage.getItem("gamely-lang")}catch(e){}
-  if(!want) want=(navigator.language||"").toLowerCase().startsWith("zh")?"zh":"en";
-  const here=document.documentElement.lang==="en"?"en":"zh";
-  if(want!==here) document.getElementById("langHint").hidden=false;
+  const pages={zh:"/",en:"/en/",ja:"/ja/",ko:"/ko/",es:"/es/",pt:"/pt/"};
+  const hints={zh:"這個頁面也有繁體中文版 →",en:"This page is also available in English →",ja:"このページは日本語でもご覧いただけます →",
+    ko:"이 페이지는 한국어로도 볼 수 있습니다 →",es:"Esta página también está disponible en español →",pt:"Esta página também está disponível em português →"};
+  if(!want){const n=(navigator.language||"").toLowerCase().slice(0,2);want=pages[n]?n:"en";}
+  const here=document.documentElement.lang.slice(0,2);
+  if(want!==here&&pages[want]){const h=document.getElementById("langHint");h.textContent=hints[want];h.href=pages[want];h.hidden=false;}
 })();
 
 // demo toggle

@@ -9,7 +9,8 @@
 - Install with Homebrew: `brew install --cask rocavence/tap/gamely` (removes the quarantine flag; update with `brew upgrade`)
 - Download: https://github.com/rocavence/Gamely-app/releases/latest
 - Source code: https://github.com/rocavence/Gamely-app
-- Website: https://gamely.rocavence.com/en/ (English), https://gamely.rocavence.com/ (繁體中文)
+- Website: https://gamely.rocavence.com/en/ (English), https://gamely.rocavence.com/ (繁體中文), plus /ja/, /ko/, /es/, /pt/
+- Current version: 0.9.0 (October 2026)
 
 ## What it does
 

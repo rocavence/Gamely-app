@@ -86,5 +86,6 @@
   "faq.q6": "If Gamely crashes mid-game, are my Hot Corners lost?",
   "faq.a6": "No. Your original settings are stored in Gamely's own preferences; the next launch sees that Game Mode has ended and restores them. Quitting Gamely normally also restores them first.",
   "faq.q7": "Does it cost anything?",
-  "faq.a7": "No. Gamely is free and open source under CC BY-NC-SA 4.0; the code is on GitHub."
+  "faq.a7": "No. Gamely is free and open source under CC BY-NC-SA 4.0; the code is on GitHub.",
+  "lang.name": "English"
 }

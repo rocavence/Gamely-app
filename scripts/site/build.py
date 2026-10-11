@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-"""產生官網：docs/index.html（中文，手寫的原始檔）→ docs/en/index.html（英文）。
+"""產生官網：docs/index.html（中文，手寫的原始檔）→ docs/<語言>/index.html（英、日、韓、西、葡）。
 
 用法：python3 scripts/site/build.py
-- 中文改 docs/index.html；英文改 scripts/site/en.json，key 對應頁面上的 data-i（內文）、
+- 中文改 docs/index.html；其他語言改 scripts/site/<語言>.json，key 對應頁面上的 data-i（內文）、
   data-i-content（meta content）、data-i-href（連結）
 - 版本號從 project.yml 的 MARKETING_VERSION 帶入（<span class="ver"> 與 JSON-LD softwareVersion）
 - FAQ 的 JSON-LD 由頁面上的 FAQ（data-i="faq.qN" / "faq.aN"）產生，兩頁各自一份
@@ -21,8 +21,9 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
 DOCS = ROOT / "docs"
 ZH = DOCS / "index.html"
-EN = DOCS / "en/index.html"
-STRINGS = Path(__file__).with_name("en.json")
+HERE = Path(__file__).parent
+# 翻譯檔 → (<html lang>, 網址路徑)
+LANGS = {"en": ("en", "en"), "ja": ("ja", "ja"), "ko": ("ko", "ko"), "es": ("es", "es"), "pt": ("pt-BR", "pt")}
 
 
 def inner(s: str, opening: re.Match) -> tuple[int, int]:
@@ -73,38 +74,49 @@ def set_faq_ld(s: str) -> str:
     return out
 
 
-def translate(s: str, en: dict[str, str]) -> str:
+def translate(s: str, en: dict[str, str], code: str, lang: str, path: str) -> str:
     used = set(keys(s, "data-i")) | set(keys(s, "data-i-content")) | set(keys(s, "data-i-href"))
     if missing := sorted(used - en.keys()):
-        sys.exit(f"en.json 缺少：{', '.join(missing)}")
+        sys.exit(f"{code}.json 缺少：{', '.join(missing)}")
     if unused := sorted(en.keys() - used):
-        print(f"en.json 沒用到：{', '.join(unused)}")
+        print(f"{code}.json 沒用到：{', '.join(unused)}")
     for m in reversed(openings(s)):  # 從後往前換，前面的位置才不會跑掉
         a, b = inner(s, m)
         s = s[:a] + en[m.group(2)] + s[b:]
     for attr, target in (("data-i-content", "content"), ("data-i-href", "href")):
         s = re.sub(rf'(\s{attr}="([^"]+)"\s{target}=")[^"]*"',
                    lambda m: m.group(1) + html.escape(en[m.group(2)], quote=True) + '"', s)
-    s = s.replace('<html lang="zh-Hant">', '<html lang="en">', 1)
-    s = s.replace('data-lang="zh" class="on"', 'data-lang="zh"').replace('data-lang="en">', 'data-lang="en" class="on">')
-    s = s.replace('"url": "https://gamely.rocavence.com/"', '"url": "https://gamely.rocavence.com/en/"')
+    s = s.replace('<html lang="zh-Hant">', f'<html lang="{lang}">', 1)
+    s = s.replace('data-lang="zh" class="on"', 'data-lang="zh"').replace(f'data-lang="{code}">', f'data-lang="{code}" class="on">')
+    s = s.replace('"url": "https://gamely.rocavence.com/"', f'"url": "https://gamely.rocavence.com/{path}/"')
     return s.replace("<head>", "<head>\n<!-- 由 scripts/site/build.py 產生，不要手改 -->", 1)
+
+
+def write_sitemap(today: str) -> None:
+    """每種語言一個網址，各自列出全部語言版本；外加 llms.txt。"""
+    site = "https://gamely.rocavence.com"
+    pages = [("zh-Hant", "/")] + [(lang, f"/{path}/") for lang, path in LANGS.values()]
+    alternates = "\n".join(f'    <xhtml:link rel="alternate" hreflang="{lang}" href="{site}{url}"/>' for lang, url in pages)
+    alternates += f'\n    <xhtml:link rel="alternate" hreflang="x-default" href="{site}/en/"/>'
+    urls = "".join(f"  <url>\n    <loc>{site}{url}</loc>\n    <lastmod>{today}</lastmod>\n{alternates}\n  </url>\n" for _, url in pages)
+    urls += f"  <url>\n    <loc>{site}/llms.txt</loc>\n    <lastmod>{today}</lastmod>\n  </url>\n"
+    (DOCS / "sitemap.xml").write_text('<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"\n'
+                                      f'        xmlns:xhtml="http://www.w3.org/1999/xhtml">\n{urls}</urlset>\n')
 
 
 def main() -> None:
     version = re.search(r'MARKETING_VERSION: "([^"]+)"', (ROOT / "project.yml").read_text()).group(1)
-    en = json.loads(STRINGS.read_text())
-
     zh = set_faq_ld(set_version(ZH.read_text(), version))
     ZH.write_text(zh)
 
-    EN.parent.mkdir(exist_ok=True)
-    EN.write_text(set_faq_ld(translate(zh, en)))
+    for code, (lang, path) in LANGS.items():
+        strings = json.loads((HERE / f"{code}.json").read_text())
+        out = DOCS / path / "index.html"
+        out.parent.mkdir(exist_ok=True)
+        out.write_text(set_faq_ld(set_version(translate(zh, strings, code, lang, path), version)))
 
-    today = datetime.date.today().isoformat()
-    sitemap = DOCS / "sitemap.xml"
-    sitemap.write_text(re.sub(r"<lastmod>[^<]*</lastmod>", f"<lastmod>{today}</lastmod>", sitemap.read_text()))
-    print(f"官網已產生：v{version}，docs/index.html + docs/en/index.html")
+    write_sitemap(datetime.date.today().isoformat())
+    print(f"官網已產生：v{version}，docs/index.html + " + "、".join(f"docs/{p}/" for _, p in LANGS.values()))
 
 
 if __name__ == "__main__":

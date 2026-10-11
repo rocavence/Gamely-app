@@ -6,6 +6,10 @@
     <lastmod>2026-10-11</lastmod>
     <xhtml:link rel="alternate" hreflang="zh-Hant" href="https://gamely.rocavence.com/"/>
     <xhtml:link rel="alternate" hreflang="en" href="https://gamely.rocavence.com/en/"/>
+    <xhtml:link rel="alternate" hreflang="ja" href="https://gamely.rocavence.com/ja/"/>
+    <xhtml:link rel="alternate" hreflang="ko" href="https://gamely.rocavence.com/ko/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://gamely.rocavence.com/es/"/>
+    <xhtml:link rel="alternate" hreflang="pt-BR" href="https://gamely.rocavence.com/pt/"/>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://gamely.rocavence.com/en/"/>
   </url>
   <url>
@@ -13,6 +17,58 @@
     <lastmod>2026-10-11</lastmod>
     <xhtml:link rel="alternate" hreflang="zh-Hant" href="https://gamely.rocavence.com/"/>
     <xhtml:link rel="alternate" hreflang="en" href="https://gamely.rocavence.com/en/"/>
+    <xhtml:link rel="alternate" hreflang="ja" href="https://gamely.rocavence.com/ja/"/>
+    <xhtml:link rel="alternate" hreflang="ko" href="https://gamely.rocavence.com/ko/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://gamely.rocavence.com/es/"/>
+    <xhtml:link rel="alternate" hreflang="pt-BR" href="https://gamely.rocavence.com/pt/"/>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://gamely.rocavence.com/en/"/>
+  </url>
+  <url>
+    <loc>https://gamely.rocavence.com/ja/</loc>
+    <lastmod>2026-10-11</lastmod>
+    <xhtml:link rel="alternate" hreflang="zh-Hant" href="https://gamely.rocavence.com/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://gamely.rocavence.com/en/"/>
+    <xhtml:link rel="alternate" hreflang="ja" href="https://gamely.rocavence.com/ja/"/>
+    <xhtml:link rel="alternate" hreflang="ko" href="https://gamely.rocavence.com/ko/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://gamely.rocavence.com/es/"/>
+    <xhtml:link rel="alternate" hreflang="pt-BR" href="https://gamely.rocavence.com/pt/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://gamely.rocavence.com/en/"/>
+  </url>
+  <url>
+    <loc>https://gamely.rocavence.com/ko/</loc>
+    <lastmod>2026-10-11</lastmod>
+    <xhtml:link rel="alternate" hreflang="zh-Hant" href="https://gamely.rocavence.com/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://gamely.rocavence.com/en/"/>
+    <xhtml:link rel="alternate" hreflang="ja" href="https://gamely.rocavence.com/ja/"/>
+    <xhtml:link rel="alternate" hreflang="ko" href="https://gamely.rocavence.com/ko/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://gamely.rocavence.com/es/"/>
+    <xhtml:link rel="alternate" hreflang="pt-BR" href="https://gamely.rocavence.com/pt/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://gamely.rocavence.com/en/"/>
+  </url>
+  <url>
+    <loc>https://gamely.rocavence.com/es/</loc>
+    <lastmod>2026-10-11</lastmod>
+    <xhtml:link rel="alternate" hreflang="zh-Hant" href="https://gamely.rocavence.com/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://gamely.rocavence.com/en/"/>
+    <xhtml:link rel="alternate" hreflang="ja" href="https://gamely.rocavence.com/ja/"/>
+    <xhtml:link rel="alternate" hreflang="ko" href="https://gamely.rocavence.com/ko/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://gamely.rocavence.com/es/"/>
+    <xhtml:link rel="alternate" hreflang="pt-BR" href="https://gamely.rocavence.com/pt/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://gamely.rocavence.com/en/"/>
+  </url>
+  <url>
+    <loc>https://gamely.rocavence.com/pt/</loc>
+    <lastmod>2026-10-11</lastmod>
+    <xhtml:link rel="alternate" hreflang="zh-Hant" href="https://gamely.rocavence.com/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://gamely.rocavence.com/en/"/>
+    <xhtml:link rel="alternate" hreflang="ja" href="https://gamely.rocavence.com/ja/"/>
+    <xhtml:link rel="alternate" hreflang="ko" href="https://gamely.rocavence.com/ko/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://gamely.rocavence.com/es/"/>
+    <xhtml:link rel="alternate" hreflang="pt-BR" href="https://gamely.rocavence.com/pt/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://gamely.rocavence.com/en/"/>
+  </url>
+  <url>
+    <loc>https://gamely.rocavence.com/llms.txt</loc>
+    <lastmod>2026-10-11</lastmod>
   </url>
 </urlset>

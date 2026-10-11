@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<!-- 由 scripts/site/build.py 產生，不要手改 -->
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title data-i="meta.title">Gamely — Desactiva las esquinas activas de macOS al jugar</title>
+<meta name="description" data-i-content="meta.desc" content="Gamely es una app gratuita y de código abierto para la barra de menús de macOS que desactiva las cuatro esquinas activas en cuanto empieza el Modo Juego, para que un despiste con el ratón no abra Mission Control a mitad de partida, y luego restaura tu configuración tal cual. Compatible con juegos de Steam y CrossOver mediante Apps forzadas. macOS 14 o posterior.">
+<meta name="author" content="rocavence">
+<meta name="robots" content="index, follow, max-image-preview:large">
+<link rel="canonical" data-i-href="meta.url" href="https://gamely.rocavence.com/es/">
+<link rel="alternate" hreflang="zh-Hant" href="https://gamely.rocavence.com/">
+<link rel="alternate" hreflang="en" href="https://gamely.rocavence.com/en/">
+<link rel="alternate" hreflang="ja" href="https://gamely.rocavence.com/ja/">
+<link rel="alternate" hreflang="ko" href="https://gamely.rocavence.com/ko/">
+<link rel="alternate" hreflang="es" href="https://gamely.rocavence.com/es/">
+<link rel="alternate" hreflang="pt-BR" href="https://gamely.rocavence.com/pt/">
+<link rel="alternate" hreflang="x-default" href="https://gamely.rocavence.com/en/">
+<link rel="alternate" type="text/plain" title="llms.txt" href="/llms.txt">
+<link rel="icon" type="image/png" href="/favicon.png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<!-- Open Graph -->
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Gamely">
+<meta property="og:url" data-i-content="meta.url" content="https://gamely.rocavence.com/es/">
+<meta property="og:title" data-i-content="meta.ogtitle" content="Gamely — Desactiva las esquinas activas de macOS al jugar">
+<meta property="og:description" data-i-content="meta.ogdesc" content="En cuanto se activa el Modo Juego de macOS, Gamely desactiva las cuatro esquinas activas y las restaura tal cual al terminar. Gratis, de código abierto y en la barra de menús.">
+<meta property="og:image" content="https://gamely.rocavence.com/og.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" data-i-content="meta.ogtitle" content="Gamely — Desactiva las esquinas activas de macOS al jugar">
+<meta property="og:locale" data-i-content="meta.locale" content="es_ES">
+<meta property="og:locale:alternate" data-i-content="meta.localealt" content="en_US">
+<!-- Twitter -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" data-i-content="meta.ogtitle" content="Gamely — Desactiva las esquinas activas de macOS al jugar">
+<meta name="twitter:description" data-i-content="meta.ogdesc" content="En cuanto se activa el Modo Juego de macOS, Gamely desactiva las cuatro esquinas activas y las restaura tal cual al terminar. Gratis, de código abierto y en la barra de menús.">
+<meta name="twitter:image" content="https://gamely.rocavence.com/og.jpg">
+<!-- Structured data: SoftwareApplication（softwareVersion 由 scripts/site/build.py 從 project.yml 帶入） -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "Gamely",
+  "applicationCategory": "UtilitiesApplication",
+  "applicationSubCategory": "Menu Bar Utility",
+  "operatingSystem": "macOS 14.0 or later",
+  "softwareVersion": "0.9.0",
+  "description": "Gamely is a free, open-source macOS menu bar utility. When macOS Game Mode turns on, it automatically disables all four Hot Corners so a stray mouse can't trigger Mission Control during fullscreen games, and restores your exact original settings when the game ends.",
+  "url": "https://gamely.rocavence.com/es/",
+  "image": "https://gamely.rocavence.com/icon.png",
+  "screenshot": "https://gamely.rocavence.com/og.jpg",
+  "downloadUrl": "https://github.com/rocavence/Gamely-app/releases/latest",
+  "installUrl": "https://github.com/rocavence/Gamely-app/releases/latest",
+  "softwareHelp": "https://github.com/rocavence/Gamely-app",
+  "codeRepository": "https://github.com/rocavence/Gamely-app",
+  "license": "https://creativecommons.org/licenses/by-nc-sa/4.0/",
+  "inLanguage": ["zh-Hant", "en", "ja", "ko", "es", "pt"],
+  "isAccessibleForFree": true,
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+  "author": { "@type": "Person", "name": "rocavence", "url": "https://github.com/rocavence" },
+  "featureList": [
+    "Follows the official macOS Game Mode signal (no guessing or process scanning)",
+    "Disables all four Hot Corners during fullscreen games",
+    "Restores the exact original Hot Corner settings, including modifier keys",
+    "Forced Apps: pause Hot Corners for games that never turn on Game Mode (Steam, CrossOver, Whisky)",
+    "Crash-safe: restores on next launch after a crash or forced quit",
+    "Launch at login via SMAppService",
+    "Settings window, first-run guide and a daily update check",
+    "Six languages: Traditional Chinese, English, Japanese, Korean, Spanish, Portuguese",
+    "Install with Homebrew: brew install --cask rocavence/tap/gamely"
+  ]
+}
+</script>
+<!-- Structured data: FAQ（由 scripts/site/build.py 從頁面上的 FAQ 產生，不要手改） -->
+<script type="application/ld+json" id="ld-faq">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "¿Qué es Gamely?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Una utilidad para la barra de menús de macOS. En cuanto se activa el Modo Juego, pone las cuatro esquinas activas en «sin acción», para que un despiste con el ratón no abra Mission Control, el Escritorio ni el salvapantallas a mitad de partida. Al terminar, restaura tu configuración original, teclas modificadoras incluidas."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "¿Por qué no desactivar las esquinas activas en Ajustes del Sistema?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Entonces tienes que acordarte de desactivarlas, de volver a activarlas y de qué tenía cada una de las cuatro esquinas. Gamely hace ambas cosas solo, siguiendo el Modo Juego."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "¿Por qué no reacciona con mi juego de Steam o CrossOver?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "macOS solo activa el Modo Juego en apps a pantalla completa clasificadas como juegos. Los juegos de Windows que funcionan con una capa de traducción no suelen cumplirlo, así que Gamely no tiene nada que seguir. Añádelos como Apps forzadas y Gamely pausará las esquinas activas cuando uno esté al frente."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "¿Qué versiones de macOS son compatibles?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "macOS 14 Sonoma o posterior. El Modo Juego apareció en Sonoma."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "¿Por qué se bloquea la primera apertura?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Gamely está autofirmado y no está notarizado por Apple, así que macOS bloquea la primera apertura. Ejecuta el comando de una línea de los pasos de instalación de arriba para quitar la marca de cuarentena; si lo instalas con Homebrew, se encarga él."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Si Gamely se cierra a mitad de partida, ¿pierdo mis esquinas activas?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "No. Tu configuración original se guarda en las preferencias de Gamely; el siguiente arranque ve que el Modo Juego ha terminado y la restaura. Al salir de Gamely normalmente, también la restaura antes."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "¿Cuesta algo?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "No. Gamely es gratis y de código abierto bajo CC BY-NC-SA 4.0; el código está en GitHub."
+      }
+    }
+  ]
+}
+</script>
+<style>
+  :root{
+    --violet:#7c5cff;
+    --violet-2:#5e34d9;
+    --ink:#161320;
+    --muted:#6b6577;
+    --line:#ece9f4;
+    --bg:#ffffff;
+    --bg-soft:#f7f5fc;
+    --card:#ffffff;
+    --grad:linear-gradient(140deg,#8e6cff 0%,#5e34d9 100%);
+    --radius:20px;
+    --shadow:0 24px 60px -28px rgba(67,38,160,.35);
+    --maxw:1080px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang TC","Noto Sans TC",system-ui,sans-serif;
+    color:var(--ink);background:var(--bg);line-height:1.65;
+    -webkit-font-smoothing:antialiased;
+  }
+  a{color:inherit;text-decoration:none}
+  .wrap{max-width:var(--maxw);margin:0 auto;padding:0 24px}
+  .btn{
+    display:inline-flex;align-items:center;gap:9px;border-radius:999px;
+    padding:13px 24px;font-weight:600;font-size:15px;
+    transition:transform .15s ease, box-shadow .2s ease, background .2s ease;cursor:pointer;border:0;
+  }
+  .btn-primary{background:var(--grad);color:#fff;box-shadow:0 10px 30px -10px rgba(94,52,217,.7)}
+  .btn-primary:hover{transform:translateY(-2px);box-shadow:0 16px 38px -10px rgba(94,52,217,.75)}
+  .btn-ghost{background:#f1eefb;color:var(--violet-2)}
+  .btn-ghost:hover{background:#e8e3fa}
+
+  /* NAV */
+  nav{position:sticky;top:0;z-index:50;background:rgba(255,255,255,.82);backdrop-filter:saturate(160%) blur(14px);border-bottom:1px solid var(--line)}
+  nav .wrap{display:flex;align-items:center;justify-content:space-between;height:64px}
+  .brand{display:flex;align-items:center;gap:11px;font-weight:700;font-size:18px}
+  .brand img{width:34px;height:34px;border-radius:9px}
+  .nav-right{display:flex;align-items:center;gap:18px}
+  .nav-link{color:var(--muted);font-size:14px;font-weight:500}
+  .nav-link:hover{color:var(--ink)}
+  .lang{position:relative;font-size:13px}
+  .lang summary{list-style:none;display:flex;align-items:center;gap:6px;padding:6px 12px;border:1px solid var(--line);border-radius:999px;color:var(--muted);font-weight:600;cursor:pointer;user-select:none}
+  .lang summary::-webkit-details-marker{display:none}
+  .lang summary:hover,.lang[open] summary{color:var(--ink)}
+  .lang[open] .chev{transform:rotate(180deg)}
+  .lang-menu{position:absolute;right:0;top:calc(100% + 6px);min-width:150px;padding:6px;background:#fff;border:1px solid var(--line);border-radius:12px;box-shadow:0 12px 30px rgba(20,16,40,.12);display:flex;flex-direction:column}
+  .lang-menu a{padding:8px 12px;border-radius:8px;color:var(--ink);font-weight:500}
+  .lang-menu a:hover{background:#f1eefb}
+  .lang-menu a.on{color:var(--violet-2);font-weight:700}
+
+  /* HERO */
+  .hero{padding:84px 0 40px;text-align:center;position:relative;overflow:hidden}
+  .hero::before{content:"";position:absolute;inset:0;background:radial-gradient(620px 360px at 50% -8%,rgba(124,92,255,.18),transparent 70%);pointer-events:none}
+  .hero .appicon{width:104px;height:104px;border-radius:24px;box-shadow:var(--shadow);margin-bottom:26px}
+  h1{font-size:clamp(34px,5.4vw,58px);line-height:1.08;letter-spacing:-.02em;font-weight:800;max-width:760px;margin:0 auto}
+  h1 .hl{background:var(--grad);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+  .sub{margin:22px auto 0;max-width:560px;color:var(--muted);font-size:clamp(16px,2vw,19px)}
+  .cta{margin-top:34px;display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
+  .meta{margin-top:18px;font-size:13px;color:var(--muted)}
+  .meta b{color:var(--ink);font-weight:600}
+
+  /* DEMO */
+  .demo-stage{margin:54px auto 0;max-width:760px}
+  .screen{
+    position:relative;aspect-ratio:16/10;border-radius:18px;
+    background:linear-gradient(160deg,#241b3d,#140f24);border:1px solid #2c2347;
+    box-shadow:var(--shadow);overflow:hidden;
+  }
+  .menubar{position:absolute;top:0;left:0;right:0;height:26px;background:rgba(255,255,255,.07);display:flex;align-items:center;justify-content:flex-end;gap:14px;padding:0 12px;font-size:12px;color:rgba(255,255,255,.7)}
+  .menubar .pad{font-size:13px;transition:transform .3s}
+  .menubar .clock{font-variant-numeric:tabular-nums}
+  .corner{
+    position:absolute;width:78px;height:78px;display:flex;align-items:center;justify-content:center;
+    font-size:11px;color:rgba(255,255,255,.5);transition:.4s ease;
+  }
+  .corner span{display:flex;flex-direction:column;align-items:center;gap:5px;text-align:center;line-height:1.2}
+  .corner .ic{width:30px;height:30px;border-radius:8px;background:rgba(124,92,255,.22);border:1px solid rgba(124,92,255,.4);display:flex;align-items:center;justify-content:center;font-size:15px;transition:.4s}
+  .corner.tl{top:30px;left:8px}.corner.tr{top:30px;right:8px}
+  .corner.bl{bottom:8px;left:8px}.corner.br{bottom:8px;right:8px}
+  .game-label{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;color:#fff;opacity:0;transition:.4s;pointer-events:none}
+  .game-label .big{font-size:34px}
+  .game-label .txt{font-size:14px;color:rgba(255,255,255,.7);letter-spacing:.04em}
+  /* ON state */
+  .screen.on{background:linear-gradient(160deg,#3a2566,#1c1430)}
+  .screen.on .corner{opacity:.28;transform:scale(.92)}
+  .screen.on .corner .ic{background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.12);filter:grayscale(1)}
+  .screen.on .game-label{opacity:1}
+  .screen.on .menubar .pad{transform:scale(1.25)}
+  .demo-ctrl{display:flex;align-items:center;justify-content:center;gap:14px;margin-top:22px;flex-wrap:wrap}
+  .toggle{display:inline-flex;align-items:center;gap:10px;font-weight:600;cursor:pointer;user-select:none}
+  .switch{width:50px;height:28px;border-radius:999px;background:#d8d2ea;position:relative;transition:.25s}
+  .switch::after{content:"";position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.25);transition:.25s}
+  .toggle.on .switch{background:var(--violet)}
+  .toggle.on .switch::after{transform:translateX(22px)}
+  .demo-hint{font-size:13px;color:var(--muted)}
+
+  /* SECTIONS */
+  section.block{padding:88px 0}
+  .block.soft{background:var(--bg-soft)}
+  .eyebrow{display:inline-block;font-size:13px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--violet);margin-bottom:14px}
+  h2{font-size:clamp(26px,3.6vw,38px);letter-spacing:-.02em;font-weight:800;line-height:1.15}
+  .lead{color:var(--muted);font-size:17px;margin-top:14px;max-width:560px}
+  .center{text-align:center}.center .lead{margin-left:auto;margin-right:auto}
+
+  /* STEPS */
+  .steps{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;margin-top:50px}
+  .step{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:30px 26px;position:relative}
+  .step .num{width:34px;height:34px;border-radius:10px;background:var(--grad);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:15px;margin-bottom:18px}
+  .step h3{font-size:18px;margin-bottom:8px}
+  .step p{color:var(--muted);font-size:14.5px}
+  .step code,.card code{background:#f1eefb;color:var(--violet-2);padding:1px 6px;border-radius:6px;font-size:12.5px}
+
+  /* FEATURES */
+  .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-top:50px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:28px 24px;transition:.2s}
+  .card:hover{transform:translateY(-4px);box-shadow:var(--shadow);border-color:#e0d9f5}
+  .card .emoji{font-size:26px;display:block;margin-bottom:14px}
+  .card h3{font-size:17px;margin-bottom:7px}
+  .card p{color:var(--muted);font-size:14.5px}
+
+  /* NOTE */
+  .note{max-width:660px;margin:0 auto;text-align:center}
+  .note p{color:#413c4f;font-size:18px;margin-top:16px}
+  .note .sig{margin-top:24px;color:var(--muted);font-size:15px}
+  .author{display:inline-flex;align-items:center;gap:12px;margin-top:28px;padding:8px 16px 8px 8px;border:1px solid var(--line);border-radius:999px;transition:.2s}
+  .author:hover{border-color:#e0d9f5;box-shadow:var(--shadow);transform:translateY(-2px)}
+  .author img{width:42px;height:42px;border-radius:50%;background:var(--bg-soft)}
+  .author .who{display:flex;flex-direction:column;align-items:flex-start;line-height:1.3}
+  .author .who b{font-size:15px;color:var(--ink)}
+  .author .who small{font-size:12.5px;color:var(--muted)}
+
+  /* INSTALL */
+  .install-box{max-width:680px;margin:36px auto 0;background:#1a1430;border-radius:var(--radius);padding:6px;box-shadow:var(--shadow)}
+  .install-box .bar{display:flex;gap:7px;padding:13px 16px}
+  .install-box .bar i{width:11px;height:11px;border-radius:50%;display:block}
+  .install-box .bar i:nth-child(1){background:#ff5f57}.install-box .bar i:nth-child(2){background:#febc2e}.install-box .bar i:nth-child(3){background:#28c840}
+  .install-box pre{padding:6px 22px 22px;color:#e8e3fa;font-size:13.5px;line-height:1.9;overflow-x:auto;font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+  .install-box .c{color:#9a8fc4}
+
+  /* FOOTER */
+  footer{border-top:1px solid var(--line);padding:38px 0;color:var(--muted);font-size:14px}
+  footer .wrap{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:14px}
+  footer a{color:var(--muted)}footer a:hover{color:var(--ink)}
+  .foot-links{display:flex;gap:20px}
+
+  @media(max-width:760px){
+    .steps,.grid{grid-template-columns:1fr}
+    section.block{padding:60px 0}
+    .hero{padding:56px 0 20px}
+    .nav-link.hide-sm{display:none}
+  }
+
+  /* 安裝步驟（給第一次用終端機的人） */
+  .how-steps{max-width:700px;margin:34px auto 0;list-style:none;display:grid;gap:12px;text-align:left;counter-reset:st}
+  .how-steps li{position:relative;padding:15px 20px 15px 62px;background:var(--bg-soft);border:1px solid var(--line);border-radius:14px;color:var(--muted);font-size:15px;line-height:1.6;counter-increment:st}
+  .how-steps li::before{content:counter(st);position:absolute;left:18px;top:14px;width:28px;height:28px;border-radius:50%;background:var(--ink);color:var(--bg-soft);font-weight:700;font-size:14px;display:flex;align-items:center;justify-content:center}
+  .how-steps li b{color:var(--ink)}
+  .how-steps kbd{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.86em;background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.16);border-bottom-width:2px;border-radius:6px;padding:1px 7px;color:var(--ink)}
+  .install-box{position:relative}
+  .install-box pre{white-space:pre-wrap;word-break:break-all}
+  .install-box .cmd{user-select:all;-webkit-user-select:all;cursor:text}
+  .copy-btn{position:absolute;top:9px;right:12px;border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.08);color:#eef0f4;font:600 13px/1 -apple-system,BlinkMacSystemFont,"PingFang TC",sans-serif;padding:8px 14px;border-radius:8px;cursor:pointer;transition:.2s}
+  .copy-btn:hover{background:rgba(255,255,255,.16)}
+  .copy-btn.ok{background:#28c840;border-color:transparent;color:#06210d}
+  .brew-lead{max-width:700px;margin:32px auto 12px;font-size:15px;color:var(--ink);text-align:left}
+  .brew-lead code{font:13px ui-monospace,SFMono-Regular,Menlo,monospace;background:var(--bg-soft);border:1px solid var(--line);border-radius:6px;padding:1px 6px}
+  .why{max-width:700px;margin:20px auto 0;font-size:14px;color:var(--muted);text-align:left;background:var(--bg-soft);border:1px solid var(--line);border-radius:14px;padding:16px 20px}
+  .why b{color:var(--ink)}
+
+  /* FAQ */
+  .faq{max-width:760px;margin:40px auto 0;display:grid;gap:12px}
+  .qa{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:0 22px}
+  .qa summary{cursor:pointer;font-weight:700;font-size:16px;padding:18px 0;list-style:none;display:flex;justify-content:space-between;gap:16px}
+  .qa summary::-webkit-details-marker{display:none}
+  .qa summary::after{content:"+";color:var(--violet);font-weight:400;font-size:22px;line-height:1}
+  .qa[open] summary::after{content:"−"}
+  .qa p{color:var(--muted);font-size:15px;padding:0 0 18px}
+
+  /* 瀏覽器語言跟這頁不同時，提示另一個語言的版本 */
+  .lang-hint{display:block;text-align:center;font-size:14px;padding:9px 16px;background:var(--bg-soft);border-bottom:1px solid var(--line);color:var(--violet-2);font-weight:600}
+  .lang-hint[hidden]{display:none}
+</style>
+</head>
+<body>
+
+<a class="lang-hint" id="langHint" data-i-href="langhint.href" href="/" data-i="langhint" hidden>這個頁面也有繁體中文版 →</a>
+<nav>
+  <div class="wrap">
+    <a class="brand" href="#top"><img src="/icon-256.png" alt="Gamely" width="34" height="34"><span>Gamely</span></a>
+    <div class="nav-right">
+      <a class="nav-link hide-sm" href="#how" data-i="nav.how">Cómo funciona</a>
+      <a class="nav-link hide-sm" href="#features" data-i="nav.features">Funciones</a>
+      <a class="nav-link hide-sm" href="#faq" data-i="nav.faq">Preguntas</a>
+      <a class="nav-link hide-sm" href="https://github.com/rocavence/Gamely-app" target="_blank" rel="noopener">GitHub</a>
+      <details class="lang">
+        <summary aria-label="Language"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.6 3.8 5.6 3.8 9s-1.3 6.4-3.8 9c-2.5-2.6-3.8-5.6-3.8-9S9.5 5.6 12 3z"/></svg><span data-i="lang.name">Español</span><svg class="chev" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></summary>
+        <div class="lang-menu">
+          <a href="/" hreflang="zh-Hant" lang="zh-Hant" data-lang="zh">繁體中文</a>
+          <a href="/en/" hreflang="en" lang="en" data-lang="en">English</a>
+          <a href="/ja/" hreflang="ja" lang="ja" data-lang="ja">日本語</a>
+          <a href="/ko/" hreflang="ko" lang="ko" data-lang="ko">한국어</a>
+          <a href="/es/" hreflang="es" lang="es" data-lang="es" class="on">Español</a>
+          <a href="/pt/" hreflang="pt-BR" lang="pt-BR" data-lang="pt">Português</a>
+        </div>
+      </details>
+    </div>
+  </div>
+</nav>
+
+<header class="hero" id="top">
+  <div class="wrap">
+    <img class="appicon" src="/icon-256.png" alt="Gamely app icon" width="104" height="104">
+    <h1 data-i="hero.h1">Que un despiste con el ratón <br><span class="hl">no arruine tu juego a pantalla completa</span></h1>
+    <p class="sub" data-i="hero.sub">En cuanto se activa el Modo Juego de macOS, Gamely desactiva las cuatro esquinas activas y las restaura tal cual cuando termina la partida. Funciona en segundo plano como un solo 🎮 en la barra de menús.</p>
+    <div class="cta">
+      <a class="btn btn-primary" href="https://github.com/rocavence/Gamely-app/releases/latest" target="_blank" rel="noopener">
+        <span data-i="hero.download">Descargar Gamely</span>
+      </a>
+      <a class="btn btn-ghost" href="https://github.com/rocavence/Gamely-app" target="_blank" rel="noopener" data-i="hero.source">Código · CC BY-NC-SA</a>
+    </div>
+    <p class="meta"><b>macOS 14+</b> · <span data-i="hero.meta">App gratuita autofirmada · v<span class="ver">0.9.0</span></span></p>
+
+    <!-- INTERACTIVE DEMO -->
+    <div class="demo-stage">
+      <div class="screen" id="screen">
+        <div class="menubar"><span class="pad">🎮</span><span class="clock">22:41</span></div>
+        <div class="corner tl"><span><span class="ic">🗂️</span><span data-i="demo.tl">Mission Control</span></span></div>
+        <div class="corner tr"><span><span class="ic">🖥️</span><span data-i="demo.tr">Escritorio</span></span></div>
+        <div class="corner bl"><span><span class="ic">📝</span><span data-i="demo.bl">Nota rápida</span></span></div>
+        <div class="corner br"><span><span class="ic">🌙</span><span data-i="demo.br">Salvapantallas</span></span></div>
+        <div class="game-label"><span class="big">🎮</span><span class="txt" data-i="demo.gameon">MODO JUEGO · Esquinas activas en pausa</span></div>
+      </div>
+      <div class="demo-ctrl">
+        <label class="toggle" id="toggle">
+          <span class="switch"></span><span data-i="demo.toggle">Simular Modo Juego</span>
+        </label>
+        <span class="demo-hint" data-i="demo.hint">← actívalo y mira las cuatro esquinas</span>
+      </div>
+    </div>
+  </div>
+</header>
+
+<section class="block soft" id="how">
+  <div class="wrap center">
+    <span class="eyebrow" data-i="how.eyebrow">Cómo funciona</span>
+    <h2 data-i="how.h2">Tres cosas, todas automáticas</h2>
+    <p class="lead" data-i="how.lead">No hay una API pública del Modo Juego. Gamely lo detecta de forma fiable en el registro unificado del sistema y luego lee y escribe las preferencias del Dock, sin que tengas que hacer nada.</p>
+    <div class="steps" style="text-align:left">
+      <div class="step">
+        <div class="num">1</div>
+        <h3 data-i="how.s1h">Detecta el Modo Juego</h3>
+        <p data-i="how.s1p">Vigila <code>log stream</code>; cuando <code>gamepolicyd</code> escribe «Game mode is on», sabe que ha empezado un juego a pantalla completa.</p>
+      </div>
+      <div class="step">
+        <div class="num">2</div>
+        <h3 data-i="how.s2h">Pausa las esquinas</h3>
+        <p data-i="how.s2p">Guarda tu configuración actual de esquinas activas, pone las cuatro en «sin acción» y lo aplica con <code>killall Dock</code>, sin que se note a pantalla completa.</p>
+      </div>
+      <div class="step">
+        <div class="num">3</div>
+        <h3 data-i="how.s3h">Restaura tal cual</h3>
+        <p data-i="how.s3p">Al terminar el juego vuelve a escribir tus valores originales. Aunque Gamely se cierre a mitad de partida, el siguiente arranque los restaura solo, sin dejar nada a medias.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="block" id="features">
+  <div class="wrap center">
+    <span class="eyebrow" data-i="feat.eyebrow">Funciones</span>
+    <h2 data-i="feat.h2">Tan pequeño que olvidarás que está ahí</h2>
+    <p class="lead" data-i="feat.lead">Hace bien su único trabajo y no te molesta con nada más.</p>
+    <div class="grid" style="text-align:left">
+      <div class="card"><span class="emoji">🎯</span><h3 data-i="feat.c1h">Sigue el Modo Juego del sistema</h3><p data-i="feat.c1p">Sin adivinar ni escanear procesos: sigue estrictamente el interruptor oficial del Modo Juego de macOS.</p></div>
+      <div class="card"><span class="emoji">↩️</span><h3 data-i="feat.c2h">Restauración exacta</h3><p data-i="feat.c2p">Recuerda hasta las teclas modificadoras, así tus esquinas vuelven idénticas después de jugar.</p></div>
+      <div class="card"><span class="emoji">🛟</span><h3 data-i="feat.c3h">A prueba de cierres</h3><p data-i="feat.c3p">Los valores originales se guardan en sus propias preferencias; un cierre inesperado se detecta y se restaura en el siguiente arranque.</p></div>
+      <div class="card"><span class="emoji">🚀</span><h3 data-i="feat.c4h">Abrir al iniciar sesión</h3><p data-i="feat.c4p">Se registra como ítem de inicio con SMAppService: lo configuras una vez y te olvidas de que existe.</p></div>
+      <div class="card"><span class="emoji">🍔</span><h3 data-i="feat.c5h">Solo un icono en la barra de menús</h3><p data-i="feat.c5p">Sin icono en el Dock ni notificaciones: solo el mando en tu barra de menús. La ventana de Ajustes está ahí cuando la necesites.</p></div>
+      <div class="card"><span class="emoji">🔀</span><h3 data-i="feat.c6h">Apágalo cuando quieras</h3><p data-i="feat.c6p">Desactiva el interruptor principal y Gamely no hace nada; o restaura las esquinas activas a mano cuando quieras.</p></div>
+      <div class="card"><span class="emoji">🕹️</span><h3 data-i="feat.c7h">Apps forzadas</h3><p data-i="feat.c7p">Los juegos que nunca activan el Modo Juego (Steam, CrossOver, Whisky) se pueden añadir a una lista; cuando uno está al frente, las esquinas también se pausan.</p></div>
+      <div class="card"><span class="emoji">🌏</span><h3 data-i="feat.c8h">Seis idiomas</h3><p data-i="feat.c8p">繁體中文, English, 日本語, 한국어, Español, Português; sigue el idioma del sistema.</p></div>
+      <div class="card"><span class="emoji">🔔</span><h3 data-i="feat.c9h">Aviso de actualizaciones</h3><p data-i="feat.c9p">Consulta GitHub una vez al día y añade un ítem al menú cuando sale una versión nueva. ¿Lo instalaste con Homebrew? Basta con <code>brew upgrade</code>.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="block soft">
+  <div class="wrap center">
+    <span class="eyebrow" data-i="inst.eyebrow">Instalación</span>
+    <h2 data-i="inst.h2">Solo arrástralo a Aplicaciones</h2>
+    <p class="lead" data-i="inst.lead">Cuatro pasos, más o menos un minuto. El paso 3 usa Terminal; tranquilo, solo hay que copiar y pegar.</p>
+    <ol class="how-steps">
+      <li data-i="inst.s1">Haz clic en <a href="https://github.com/rocavence/Gamely-app/releases/latest" target="_blank" rel="noopener" style="color:var(--ink);text-decoration:underline"><b>Descargar la última versión</b></a> y descarga el archivo <b>.zip</b> desde GitHub.</li>
+      <li data-i="inst.s2">Abre la carpeta Descargas, haz doble clic en el zip para descomprimirlo y arrastra <b>Gamely</b> a la carpeta Aplicaciones.</li>
+      <li data-i="inst.s3">Abre <b>Terminal</b>: pulsa <kbd>⌘</kbd> + <kbd>Espacio</kbd> para abrir Spotlight, escribe <b>Terminal</b> y pulsa <kbd>Return</kbd>.</li>
+      <li data-i="inst.s4">Haz clic en <b>Copiar</b>, arriba a la derecha del recuadro negro de abajo, vuelve a Terminal, pulsa <kbd>⌘</kbd> + <kbd>V</kbd> para pegar y luego <kbd>Return</kbd>. Gamely se abre; a partir de ahí, ábrelo desde Aplicaciones como siempre.</li>
+    </ol>
+    <div class="install-box">
+      <div class="bar"><i></i><i></i><i></i></div>
+      <button class="copy-btn" type="button" data-target="installCmd" data-i="inst.copy">Copiar</button>
+      <pre><span class="cmd" id="installCmd">xattr -dr com.apple.quarantine /Applications/Gamely.app && open /Applications/Gamely.app</span></pre>
+    </div>
+    <p class="why" data-i="inst.why"><b>¿Y esto qué hace?</b> Gamely es una app gratuita, autofirmada y sin notarizar por Apple. No vivo de hacer apps; solo construyo cosas pequeñas que me resultan útiles y bonitas, y la cuota anual de desarrollador de Apple no entra en el presupuesto… Por eso macOS bloquea la primera apertura. Esta línea solo quita la marca de cuarentena que se añadió al descargarla y abre Gamely. No cambia nada más y solo hace falta una vez.</p>
+    <p class="brew-lead" data-i="inst.brew">¿Usas Homebrew? Una línea lo instala, cuarentena incluida, y <code>brew upgrade</code> lo mantiene al día.</p>
+    <div class="install-box">
+      <div class="bar"><i></i><i></i><i></i></div>
+      <button class="copy-btn" type="button" data-target="brewCmd" data-i="inst.copy">Copiar</button>
+      <pre><span class="cmd" id="brewCmd">brew install --cask rocavence/tap/gamely</span></pre>
+    </div>
+    <div class="cta" style="margin-top:30px">
+      <a class="btn btn-primary" href="https://github.com/rocavence/Gamely-app/releases/latest" target="_blank" rel="noopener"><span data-i="inst.btn">Descargar la última versión</span></a>
+    </div>
+  </div>
+</section>
+
+<section class="block soft" id="faq">
+  <div class="wrap">
+    <div class="center">
+      <span class="eyebrow" data-i="faq.eyebrow">Preguntas</span>
+      <h2 data-i="faq.h2">Preguntas que quizá tengas</h2>
+    </div>
+    <div class="faq">
+      <details class="qa"><summary data-i="faq.q1">¿Qué es Gamely?</summary><p data-i="faq.a1">Una utilidad para la barra de menús de macOS. En cuanto se activa el Modo Juego, pone las cuatro esquinas activas en «sin acción», para que un despiste con el ratón no abra Mission Control, el Escritorio ni el salvapantallas a mitad de partida. Al terminar, restaura tu configuración original, teclas modificadoras incluidas.</p></details>
+      <details class="qa"><summary data-i="faq.q2">¿Por qué no desactivar las esquinas activas en Ajustes del Sistema?</summary><p data-i="faq.a2">Entonces tienes que acordarte de desactivarlas, de volver a activarlas y de qué tenía cada una de las cuatro esquinas. Gamely hace ambas cosas solo, siguiendo el Modo Juego.</p></details>
+      <details class="qa"><summary data-i="faq.q3">¿Por qué no reacciona con mi juego de Steam o CrossOver?</summary><p data-i="faq.a3">macOS solo activa el Modo Juego en apps a pantalla completa clasificadas como juegos. Los juegos de Windows que funcionan con una capa de traducción no suelen cumplirlo, así que Gamely no tiene nada que seguir. Añádelos como Apps forzadas y Gamely pausará las esquinas activas cuando uno esté al frente.</p></details>
+      <details class="qa"><summary data-i="faq.q4">¿Qué versiones de macOS son compatibles?</summary><p data-i="faq.a4">macOS 14 Sonoma o posterior. El Modo Juego apareció en Sonoma.</p></details>
+      <details class="qa"><summary data-i="faq.q5">¿Por qué se bloquea la primera apertura?</summary><p data-i="faq.a5">Gamely está autofirmado y no está notarizado por Apple, así que macOS bloquea la primera apertura. Ejecuta el comando de una línea de los pasos de instalación de arriba para quitar la marca de cuarentena; si lo instalas con Homebrew, se encarga él.</p></details>
+      <details class="qa"><summary data-i="faq.q6">Si Gamely se cierra a mitad de partida, ¿pierdo mis esquinas activas?</summary><p data-i="faq.a6">No. Tu configuración original se guarda en las preferencias de Gamely; el siguiente arranque ve que el Modo Juego ha terminado y la restaura. Al salir de Gamely normalmente, también la restaura antes.</p></details>
+      <details class="qa"><summary data-i="faq.q7">¿Cuesta algo?</summary><p data-i="faq.a7">No. Gamely es gratis y de código abierto bajo CC BY-NC-SA 4.0; el código está en GitHub.</p></details>
+    </div>
+  </div>
+</section>
+
+<section class="block">
+  <div class="wrap">
+    <div class="note">
+      <span class="eyebrow" data-i="note.eyebrow">Una cosa más</span>
+      <p data-i="note.p1">Cuando juego, que el ratón roce una esquina y salte Mission Control me corta todo el rollo. El sistema tiene Modo Juego pero ignora las esquinas activas, así que hice la pieza que faltaba.</p>
+      <p data-i="note.p2">Gamely es pequeño, de código abierto y gratis. Si a ti también te ahorra ese momento, ya valió la pena.</p>
+      <a class="sig author" href="https://github.com/rocavence" target="_blank" rel="noopener">
+        <img src="/avatar.png" alt="rocavence" loading="lazy">
+        <span class="who"><b>@rocavence</b><small data-i="note.role">Autor · GitHub</small></span>
+      </a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="brand" style="font-size:15px"><img src="/favicon.png" alt="" style="width:24px;height:24px;border-radius:7px"><span>Gamely</span></div>
+    <div class="foot-links">
+      <a href="https://github.com/rocavence/Gamely-app" target="_blank" rel="noopener">GitHub</a>
+      <a href="https://github.com/rocavence/Gamely-app/releases/latest" target="_blank" rel="noopener" data-i="foot.dl">Descargar</a>
+      <a href="https://github.com/rocavence/Gamely-app/blob/main/README.md" target="_blank" rel="noopener" data-i="foot.docs">Documentación</a>
+    </div>
+    <span>© 2026 · CC BY-NC-SA 4.0 · <span data-i="foot.by">por</span> <a href="https://github.com/rocavence" target="_blank" rel="noopener">@rocavence</a></span>
+  </div>
+</footer>
+
+<script>
+// 記住使用者點過的語言；瀏覽器語言和這頁不同時，只顯示提示，不自動轉址（避免搜尋引擎被導走）
+document.querySelectorAll(".lang a").forEach(a=>a.addEventListener("click",()=>{try{localStorage.setItem("gamely-lang",a.dataset.lang)}catch(e){}}));
+// 點選單外面或按 Esc 就收起語言選單
+const langMenu=document.querySelector(".lang");
+document.addEventListener("click",e=>{if(langMenu.open&&!langMenu.contains(e.target))langMenu.open=false;});
+document.addEventListener("keydown",e=>{if(e.key==="Escape"&&langMenu.open){langMenu.open=false;langMenu.querySelector("summary").focus();}});
+(()=>{
+  let want=null;try{want=localStorage.getItem("gamely-lang")}catch(e){}
+  const pages={zh:"/",en:"/en/",ja:"/ja/",ko:"/ko/",es:"/es/",pt:"/pt/"};
+  const hints={zh:"這個頁面也有繁體中文版 →",en:"This page is also available in English →",ja:"このページは日本語でもご覧いただけます →",
+    ko:"이 페이지는 한국어로도 볼 수 있습니다 →",es:"Esta página también está disponible en español →",pt:"Esta página também está disponível em português →"};
+  if(!want){const n=(navigator.language||"").toLowerCase().slice(0,2);want=pages[n]?n:"en";}
+  const here=document.documentElement.lang.slice(0,2);
+  if(want!==here&&pages[want]){const h=document.getElementById("langHint");h.textContent=hints[want];h.href=pages[want];h.hidden=false;}
+})();
+
+// demo toggle
+const tg=document.getElementById("toggle"), sc=document.getElementById("screen");
+tg.onclick=()=>{tg.classList.toggle("on");sc.classList.toggle("on");};
+</script>
+<script>
+/* 安裝指令一鍵複製 */
+document.querySelectorAll(".copy-btn").forEach(b=>b.addEventListener("click",async()=>{
+  const t=document.getElementById(b.dataset.target).textContent.trim();
+  try{await navigator.clipboard.writeText(t)}catch(e){const r=document.createRange();r.selectNodeContents(document.getElementById(b.dataset.target));const s=getSelection();s.removeAllRanges();s.addRange(r);document.execCommand("copy")}
+  const zh=document.documentElement.lang!=="en";b.textContent=zh?"已複製 ✓":"Copied ✓";b.classList.add("ok");
+  setTimeout(()=>{b.textContent=zh?"複製":"Copy";b.classList.remove("ok")},1800);
+}));
+</script>
+</body>
+</html>
