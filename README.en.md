@@ -125,4 +125,4 @@ Debug builds add a "Simulate Game Mode" item to the menu, so you can test the di
 
 ## License
 
-MIT
+CC BY-NC-SA 4.0 (Attribution-NonCommercial-ShareAlike)

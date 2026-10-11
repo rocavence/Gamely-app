@@ -125,4 +125,4 @@ xcodebuild test -project Gamely.xcodeproj -scheme Gamely   # 單元測試（先�
 
 ## 授權
 
-MIT
+CC BY-NC-SA 4.0（姓名標示—非商業性—相同方式分享）

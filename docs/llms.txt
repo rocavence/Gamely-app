@@ -3,7 +3,7 @@
 > Gamely is a free, open-source macOS menu bar utility. The moment macOS Game Mode turns on, it automatically disables all four Hot Corners so a stray mouse can't trigger Mission Control, Desktop, Quick Note or the Screen Saver during a fullscreen game, then restores your exact original settings when the game ends. Games that never turn on Game Mode (Steam, CrossOver, Whisky) can be added as Forced Apps.
 
 - Platform: macOS 14 (Sonoma) or later
-- Price: Free, open source (MIT license)
+- Price: Free, open source (CC BY-NC-SA 4.0: free for non-commercial use)
 - Languages: Traditional Chinese, English, Japanese, Korean, Spanish, Portuguese
 - Author: rocavence (https://github.com/rocavence)
 - Install with Homebrew: `brew install --cask rocavence/tap/gamely` (removes the quarantine flag; update with `brew upgrade`)
@@ -44,4 +44,4 @@ Swift 6, AppKit, unified log (`log stream` / `log show`), `UserDefaults(suiteNam
 
 - Download (latest release): https://github.com/rocavence/Gamely-app/releases/latest
 - Source code & docs: https://github.com/rocavence/Gamely-app
-- License: MIT
+- License: CC BY-NC-SA 4.0
