@@ -14,7 +14,7 @@ enum LoginItem {
                 try SMAppService.mainApp.unregister()
             }
         } catch {
-            NSLog("Gamely: login item \(enabled ? "register" : "unregister") failed: \(error)")
+            log.error("login item \(enabled ? "register" : "unregister") failed: \(error)")
         }
     }
 }

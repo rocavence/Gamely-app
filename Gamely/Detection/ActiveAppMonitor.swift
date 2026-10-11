@@ -3,20 +3,17 @@ import AppKit
 /// Watches which app is frontmost and reports whether it's in the user's
 /// whitelist (`Defaults.whitelist`). Used to force "Game Mode" for apps that
 /// don't trigger real macOS Game Mode — e.g. Steam or CrossOver games.
-///
-/// Marked `@MainActor` because it only ever touches AppKit, and the workspace
-/// notification is delivered on the main queue.
 @MainActor
 final class ActiveAppMonitor {
-    /// Fired (on the main thread) whenever the whitelisted-frontmost state flips.
-    private let onChange: (Bool) -> Void
+    /// Fired whenever the whitelisted-frontmost state flips.
+    private let onChange: @MainActor (Bool) -> Void
 
     /// Whether the current frontmost app's bundle ID is in the whitelist.
     private(set) var isActive = false
 
     private var observer: NSObjectProtocol?
 
-    init(onChange: @escaping (Bool) -> Void) {
+    init(onChange: @escaping @MainActor (Bool) -> Void) {
         self.onChange = onChange
     }
 

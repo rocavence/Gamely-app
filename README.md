@@ -5,7 +5,7 @@
 macOS Game Mode 一啟動就自動關閉系統 Hot Corners，遊戲結束再自動還原。常駐選單列。
 
 <p align="center">
-  <img src="Resources/icon-1024.png" width="160" alt="Gamely icon">
+  <img src="scripts/icon/icon-1024.png" width="160" alt="Gamely icon">
 </p>
 
 ## 它在做什麼
@@ -47,11 +47,11 @@ Gamely 是自簽 app(未經 Apple 公證),第一次打開可能被擋。用 **�
 ```bash
 git clone https://github.com/rocavence/Gamely-app.git
 cd Gamely-app
-./Scripts/make-icon.sh     # 產生 app icon（選用）
-./Scripts/build-app.sh
-open build/Gamely.app
+brew install xcodegen
+./scripts/build-app.sh
+open dist/Gamely.app
 ```
-只需要 Xcode Command Line Tools。
+需要 Xcode 與 XcodeGen。改圖示：`./scripts/icon/make-icon.sh`。
 </details>
 
 ## 使用
@@ -72,29 +72,36 @@ open build/Gamely.app
 - **`log stream`/`log show`** 監看 unified log 偵測 Game Mode
 - **`UserDefaults(suiteName: "com.apple.dock")`** 讀寫 Hot Corner 設定 + `killall Dock`
 - **`SMAppService`** 開機自啟
-- **Swift Package Manager** + shell script 打 `.app` bundle，有 stable self-signed identity 時用它簽章
+- **XcodeGen** 產生 Xcode 專案、`xcodebuild` 建置；**Swift Testing** 單元測試 + 自我測試
 - **`CGContext` + SF Symbol + `iconutil`** 程式化生成 icon
 
 ## 專案結構
 
 ```
 Gamely/
-├── Package.swift
-├── Sources/
-│   └── Gamely/
-│       ├── main.swift
-│       ├── AppDelegate.swift       # 選單列 + 串接
-│       ├── GameModeMonitor.swift   # log-stream 偵測
-│       ├── HotCornerController.swift# 存/關/還原 Hot Corners
-│       ├── LoginItem.swift          # SMAppService 開機自啟
-│       └── Defaults.swift           # 偏好 + 存的原值
-├── Resources/                  # Info.plist / AppIcon.icns / icon-1024.png
-└── Scripts/                    # build-app.sh / make-icon.{sh,swift}
+├── project.yml                  # XcodeGen 專案設定（版本號只改這裡）
+├── Config/Signing.xcconfig      # 簽章；本機憑證放 Signing.local.xcconfig
+├── Gamely/
+│   ├── App/                     # 進入點、AppController（串接）、偏好、開機自啟、自我測試
+│   ├── Detection/               # Game Mode 記錄解析與監聽、強制 App 偵測、暫停條件
+│   ├── HotCorners/              # 存/關/還原 Hot Corners、防抖排程
+│   ├── Menu/                    # 選單列
+│   └── Resources/               # Assets.xcassets、Localizable.xcstrings
+├── GamelyTests/                 # 單元測試（Swift Testing）
+└── scripts/                     # build-app.sh、selftest.sh、icon/
 ```
+
+## 測試
+
+```bash
+xcodebuild test -project Gamely.xcodeproj -scheme Gamely   # 單元測試（先跑 xcodegen generate）
+./scripts/selftest.sh [hotcorners|debounce|menu]           # 自我測試
+```
+自我測試會實際操作 app 的控制器與選單，但改的是測試用的偏好設定網域，不會重啟 Dock，也不碰你真正的熱角。
 
 ## Debug
 
-`GAMELY_DEBUG=1` 會在選單加一個「Simulate Game Mode」項目，不用真的開遊戲就能測試關閉/還原流程。
+除錯版（Debug configuration）的選單會多一個「Simulate Game Mode」項目，不用真的開遊戲就能測試關閉/還原流程。
 
 ## 已知限制
 

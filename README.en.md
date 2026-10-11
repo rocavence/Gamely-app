@@ -5,7 +5,7 @@
 The moment macOS Game Mode turns on, it automatically disables the system Hot Corners, and restores them when the game ends. Lives in the menu bar.
 
 <p align="center">
-  <img src="Resources/icon-1024.png" width="160" alt="Gamely icon">
+  <img src="scripts/icon/icon-1024.png" width="160" alt="Gamely icon">
 </p>
 
 ## What it does
@@ -47,11 +47,11 @@ Gamely is self-signed (not notarized by Apple), so the first launch may be block
 ```bash
 git clone https://github.com/rocavence/Gamely-app.git
 cd Gamely-app
-./Scripts/make-icon.sh     # generate the app icon (optional)
-./Scripts/build-app.sh
-open build/Gamely.app
+brew install xcodegen
+./scripts/build-app.sh
+open dist/Gamely.app
 ```
-Requires Xcode Command Line Tools.
+Requires Xcode and XcodeGen. To change the icon: `./scripts/icon/make-icon.sh`.
 </details>
 
 ## Usage
@@ -72,29 +72,36 @@ The 🎮 icon in the menu bar:
 - **`log stream`/`log show`** to watch the unified log and detect Game Mode
 - **`UserDefaults(suiteName: "com.apple.dock")`** to read/write Hot Corner settings + `killall Dock`
 - **`SMAppService`** for launch at login
-- **Swift Package Manager** + a shell script to assemble the `.app` bundle and sign with a stable self-signed identity (when present)
+- **XcodeGen** generates the Xcode project, built with `xcodebuild`; **Swift Testing** unit tests + a self-test
 - **`CGContext` + SF Symbol + `iconutil`** to generate the icon programmatically
 
 ## Project structure
 
 ```
 Gamely/
-├── Package.swift
-├── Sources/
-│   └── Gamely/
-│       ├── main.swift
-│       ├── AppDelegate.swift       # menu bar + wiring
-│       ├── GameModeMonitor.swift   # log-stream detection
-│       ├── HotCornerController.swift# save/disable/restore Hot Corners
-│       ├── LoginItem.swift          # SMAppService launch at login
-│       └── Defaults.swift           # preferences + saved originals
-├── Resources/                  # Info.plist / AppIcon.icns / icon-1024.png
-└── Scripts/                    # build-app.sh / make-icon.{sh,swift}
+├── project.yml                  # XcodeGen project (the version number lives only here)
+├── Config/Signing.xcconfig      # signing; put your local identity in Signing.local.xcconfig
+├── Gamely/
+│   ├── App/                     # entry point, AppController (wiring), preferences, login item, self-test
+│   ├── Detection/               # Game Mode log parsing and watching, forced-app detection, pause triggers
+│   ├── HotCorners/              # save/disable/restore Hot Corners, debounced scheduling
+│   ├── Menu/                    # menu bar
+│   └── Resources/               # Assets.xcassets, Localizable.xcstrings
+├── GamelyTests/                 # unit tests (Swift Testing)
+└── scripts/                     # build-app.sh, selftest.sh, icon/
 ```
+
+## Tests
+
+```bash
+xcodebuild test -project Gamely.xcodeproj -scheme Gamely   # unit tests (run xcodegen generate first)
+./scripts/selftest.sh [hotcorners|debounce|menu]           # self-test
+```
+The self-test drives the app's real controller and menu, but against throwaway preference domains: it never restarts the Dock or touches your real Hot Corners.
 
 ## Debug
 
-`GAMELY_DEBUG=1` adds a "Simulate Game Mode" item to the menu, so you can test the disable/restore flow without actually launching a game.
+Debug builds add a "Simulate Game Mode" item to the menu, so you can test the disable/restore flow without actually launching a game.
 
 ## Known limitations
 

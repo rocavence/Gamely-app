@@ -1,6 +1,6 @@
 #!/usr/bin/env swift
 //
-// Render Gamely's app icon at 1024×1024 as Resources/icon-1024.png.
+// Render Gamely's app icon at 1024×1024 as scripts/icon/icon-1024.png.
 // Run via `swift Scripts/make-icon.swift` from the project root.
 //
 import AppKit
@@ -71,5 +71,5 @@ if let glyph = whiteSymbol("gamecontroller.fill", point: 512) {
 guard let cg = ctx.makeImage() else { fatalError("makeImage") }
 let rep = NSBitmapImageRep(cgImage: cg)
 let data = rep.representation(using: .png, properties: [:])!
-try data.write(to: URL(fileURLWithPath: "Resources/icon-1024.png"))
-print("Wrote Resources/icon-1024.png")
+try data.write(to: URL(fileURLWithPath: "scripts/icon/icon-1024.png"))
+print("Wrote scripts/icon/icon-1024.png")

@@ -1,0 +1,227 @@
+{
+  "sourceLanguage": "en",
+  "strings": {
+    "Gamely %@": {
+      "comment": "Version label in the menu, %@ is the version number",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gamely %@"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gamely %@"
+          }
+        }
+      }
+    },
+    "Game Mode: Off": {
+      "comment": "Status line when Game Mode is not active",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Game Mode: Off"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "遊戲模式：關閉"
+          }
+        }
+      }
+    },
+    "Game Mode: On": {
+      "comment": "Status line: Game Mode active",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Game Mode: On"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "遊戲模式：開啟"
+          }
+        }
+      }
+    },
+    "Game Mode: On — Hot Corners paused": {
+      "comment": "Status line: Game Mode active and Hot Corners paused",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Game Mode: On — Hot Corners paused"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "遊戲模式：開啟 — 熱角已暫停"
+          }
+        }
+      }
+    },
+    "Pause Hot Corners in Game Mode": {
+      "comment": "Toggle: pause Hot Corners while Game Mode is active",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pause Hot Corners in Game Mode"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "遊戲模式時暫停熱角"
+          }
+        }
+      }
+    },
+    "Launch at Login": {
+      "comment": "Toggle: launch Gamely at login",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Launch at Login"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "登入時啟動"
+          }
+        }
+      }
+    },
+    "Force Game Mode for Apps": {
+      "comment": "Submenu: apps that force Game Mode behavior",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Force Game Mode for Apps"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "為應用程式強制啟用遊戲模式"
+          }
+        }
+      }
+    },
+    "Add App": {
+      "comment": "Submenu: pick a running app to add to the whitelist",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Add App"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "加入應用程式"
+          }
+        }
+      }
+    },
+    "No apps to add": {
+      "comment": "Placeholder when there are no running apps to add",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No apps to add"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "沒有可加入的應用程式"
+          }
+        }
+      }
+    },
+    "Pause Hot Corners Now": {
+      "comment": "Action: pause the user's Hot Corners immediately",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pause Hot Corners Now"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "立即暫停熱角"
+          }
+        }
+      }
+    },
+    "Restore Hot Corners Now": {
+      "comment": "Action: restore the user's Hot Corners immediately",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Restore Hot Corners Now"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "立即還原熱角"
+          }
+        }
+      }
+    },
+    "Simulate Game Mode (debug)": {
+      "comment": "Debug-only action to simulate Game Mode",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Simulate Game Mode (debug)"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "模擬遊戲模式（除錯）"
+          }
+        }
+      }
+    },
+    "Quit Gamely": {
+      "comment": "Action: quit the app",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Quit Gamely"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "結束 Gamely"
+          }
+        }
+      }
+    }
+  },
+  "version": "1.0"
+}

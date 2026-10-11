@@ -1,8 +1,10 @@
 .DS_Store
 /.build
 /build
-/Packages
+/dist
 xcuserdata/
 DerivedData/
 .swiftpm/
 /Gamely-*.zip
+*.xcodeproj/
+Config/Signing.local.xcconfig
